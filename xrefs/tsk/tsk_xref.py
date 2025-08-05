@@ -176,11 +176,8 @@ with open('out.jsonl', 'w') as file:
                         targets.append(f"{tsk_to_osis[book]}.{chapter}.{verse}")
     
         ref_str = "[ " + ", ".join(map(lambda x : f"\"{x}\"", targets)) + " ]"
-        json_str = f"{{ \"source\": \"{source}\", \"source_text\": \"{source_text}\", \"targets\": {ref_str} }}\n"
+        json_str = f"{{ \"type\": \"directed\", \"source\": \"{source}\", \"source_text\": \"{source_text}\", \"targets\": {ref_str} }}\n"
 
         file.write(json_str)
-
-
-
 
 print("Done!")
