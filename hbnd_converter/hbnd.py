@@ -20,6 +20,7 @@ print(f"Reading file: {path}...")
 data: list[list[str]] = []
 with open(path, 'r', newline='') as f:
     reader = csv.reader(f)
+    next(reader)
     for row in reader:
         data.append(row)
 
