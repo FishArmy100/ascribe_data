@@ -44,20 +44,13 @@ class DestWord:
         
 
     def to_json(self) -> str:
-        s = "{ \"text\": \"" + self.text + "\""
-
-        if self.red != None:
-            s += ", \"red\": " + str(self.red)
-        if self.italics != None:
-            s += ", \"italics\": " + str(self.italics)
-
-        if self.begin_punc != None:
-            s += ", \"begin_punc\": \"" + self.begin_punc + "\""
-        if self.end_punc != None:
-            s += ", \"end_punc\": \"" + self.end_punc + "\""
-
-        s += " }"
-        return s
+        return json.dumps({
+            "text": self.text,
+            **({"red": self.red} if self.red is not None else {}),
+            **({"italics": self.italics} if self.italics is not None else {}),
+            **({"begin_punc": self.begin_punc} if self.begin_punc is not None else {}),
+            **({"end_punc": self.end_punc} if self.end_punc is not None else {}),
+        }, ensure_ascii=False)
 
 class DestVerse:
     words: List[DestWord]
@@ -68,8 +61,10 @@ class DestVerse:
         self.words = words
 
     def to_json(self) -> str:
-        words = ', '.join(map(lambda w : f"{w.to_json()}", self.words))
-        return f"{{ \"id\": \"{self.id}\", \"words\": [{words}] }}"
+        return json.dumps({
+            "id": self.id,
+            "words": [json.loads(w.to_json()) for w in self.words]
+        }, ensure_ascii=False)
 
 class DestBible:
     verses: List[DestVerse]
@@ -78,11 +73,7 @@ class DestBible:
         self.verses = verses
 
     def to_jsonl(self) -> str:
-        ret = ""
-        for v in self.verses:
-            ret += v.to_json() + "\n"
-
-        return ret
+        return '\n'.join(v.to_json() for v in self.verses)
 
 
 if len(sys.argv) < 2:
@@ -214,7 +205,7 @@ dest_bible = DestBible(verses)
 
 print("Writing to file...")
 
-with open('out.jsonl', 'w') as file:
+with open('out.jsonl', 'w', encoding='utf-8') as file:
     file.write(dest_bible.to_jsonl())
 
 print("Done!")
