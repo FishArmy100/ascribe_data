@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
 import sys
 import os
 import csv
-from typing import List, Tuple, Union
+from typing import List
+import re
 
 osis_books = [
     "Gen", "Exod", "Lev", "Num", "Deut",
@@ -89,8 +91,51 @@ tsk_to_osis = {
     "re": "Rev"
 }
 
-Verse = Tuple[str, int, Union[int, Tuple[int, int], List[int]]]
-def parse_tsk_verse(ref: str) -> List[Verse]:
+class Atom(ABC):
+    @abstractmethod
+    def __str__(self) -> str:
+        pass
+
+class ChapterAtom(Atom):
+    
+    def __init__(self, book: str, chapter: int):
+        self.book = book
+        self.chapter = chapter
+
+    def __str__(self) -> str:
+        return f"{self.book}.{self.chapter}"
+    
+class VerseAtom(Atom):
+    def __init__(self, book: str, chapter: int, verse: int):
+        self.book = book
+        self.chapter = chapter
+        self.verse = verse
+
+    def __str__(self) -> str:
+        return f"{self.book}.{self.chapter}.{self.verse}"
+    
+class RefId(ABC):
+    @abstractmethod
+    def __str__(self) -> str:
+        pass
+
+class SingleRef(RefId):
+    def __init__(self, atom: Atom):
+        self.atom = atom
+
+    def __str__(self) -> str:
+        return str(self.atom)
+    
+class RangeRef(RefId):
+    def __init__(self, start: Atom, end: Atom):
+        self.start = start
+        self.end = end
+
+    def __str__(self) -> str:
+        return f"{str(self.start)}-{str(self.end)}"
+
+
+def parse_tsk_ref_id(ref: str) -> List[RefId]:
     book_pair = ref.split()
 
     if len(book_pair) != 2:
@@ -99,22 +144,29 @@ def parse_tsk_verse(ref: str) -> List[Verse]:
     book = book_pair[0]
     chapter_pair = book_pair[1].split(':')
 
+    if re.fullmatch(r"\d+-\d+", book_pair[1]):
+        [ch_start, ch_end] = book_pair[1].split("-")
+        ch_start = int(ch_start)
+        ch_end = int(ch_end)
+
+        return [RangeRef(ChapterAtom(book, ch_start), ChapterAtom(book, ch_end))]
+
     if not chapter_pair[0].isdecimal():
         print(ref)
 
     chapter = int(chapter_pair[0])
     if chapter_pair[1].isdecimal():
-        return [(book, chapter, int(chapter_pair[1]))]
+        return [SingleRef(VerseAtom(book, chapter, int(chapter_pair[1])))]
     
-    verses = chapter_pair[1].split(",")
-    if len(verses) > 1:
-        ret_verses: List[Verse] = []
-        for verse in verses:
-            verses = verse.split('-')
+    chapter_verses = chapter_pair[1].split(",")
+    if len(chapter_verses) > 1:
+        ret_verses: List[RefId] = []
+        for chapter_verse in chapter_verses:
+            verses = chapter_verse.split('-')
             if len(verses) == 2:
-                ret_verses.append((book, chapter, (int(verses[0]), int(verses[1]))))
+                ret_verses.append(RangeRef(VerseAtom(book, chapter, int(verses[0])), VerseAtom(book, chapter, int(verses[1]))))
             elif len(verses) == 1:
-                ret_verses.append((book, chapter, int(verses[0])))
+                ret_verses.append(SingleRef(VerseAtom(book, chapter, int(verses[0]))))
             else:
                 raise RuntimeError("Unknown reference format: " + ref)
         
@@ -122,7 +174,7 @@ def parse_tsk_verse(ref: str) -> List[Verse]:
     
     verse_range = chapter_pair[1].split("-")
     if len(verse_range) == 2:
-        return [(book, chapter, (int(verse_range[0]), int(verse_range[1])))]
+        return [RangeRef(VerseAtom(book, chapter, int(verse_range[0])), VerseAtom(book, chapter, int(verse_range[1])))]
     
     raise RuntimeError("Unknown reference format: " + ref)
 
@@ -152,9 +204,9 @@ with open(path, 'r', newline='') as f:
     for row in reader:
         data.append(row)
 
-print("Writing to file: out.jsonl...")
+print("Writing to file: tsk_xrefs.jsonl...")
 
-with open('out.jsonl', 'w') as file:
+with open('tsk_xrefs.jsonl', 'w') as file:
     for row in data:
         book_index = int(row[0])
         chapter_index = int(row[1])
@@ -166,14 +218,23 @@ with open('out.jsonl', 'w') as file:
         
         targets: List[str] = []
         for ref in refs:
-            for (book, chapter, verses) in parse_tsk_verse(ref):
-                if isinstance(verses, int):
-                    targets.append(f"{tsk_to_osis[book]}.{chapter}.{verses}")
-                elif isinstance(verses, Tuple):
-                    targets.append(f"{tsk_to_osis[book]}.{chapter}.{verses[0]}-{tsk_to_osis[book]}.{chapter}.{verses[1]}")
+            for ref_id in parse_tsk_ref_id(ref):
+                if isinstance(ref_id, RangeRef):
+                    if isinstance(ref_id.start, ChapterAtom) and isinstance(ref_id.end, ChapterAtom):
+                        targets.append(f"{tsk_to_osis[ref_id.start.book]}.{ref_id.start.chapter}-{tsk_to_osis[ref_id.end.book]}.{ref_id.end.chapter}")
+                    elif isinstance(ref_id.start, VerseAtom) and isinstance(ref_id.end, VerseAtom):
+                        targets.append(f"{tsk_to_osis[ref_id.start.book]}.{ref_id.start.chapter}.{ref_id.start.verse}-{tsk_to_osis[ref_id.end.book]}.{ref_id.end.chapter}.{ref_id.end.verse}")
+                    else:
+                        raise RuntimeError(f"Error: Unknown reference format {str(ref_id)}")
+                elif isinstance(ref_id, SingleRef):
+                    if isinstance(ref_id.atom, ChapterAtom):
+                        targets.append(f"{tsk_to_osis[ref_id.atom.book]}.{ref_id.atom.chapter}")
+                    elif isinstance(ref_id.atom, VerseAtom):
+                        targets.append(f"{tsk_to_osis[ref_id.atom.book]}.{ref_id.atom.chapter}.{ref_id.atom.verse}")
+                    else:
+                        raise RuntimeError(f"Error: Unknown reference format {str(ref_id)}")
                 else:
-                    for verse in verses:
-                        targets.append(f"{tsk_to_osis[book]}.{chapter}.{verse}")
+                    raise RuntimeError(f"Error: Unknown reference format {str(ref_id)}")
     
         ref_str = "[ " + ", ".join(map(lambda x : f"\"{x}\"", targets)) + " ]"
         json_str = f"{{ \"type\": \"directed\", \"source\": \"{source}\", \"source_text\": \"{source_text}\", \"targets\": {ref_str} }}\n"
