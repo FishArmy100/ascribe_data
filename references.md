@@ -4,3 +4,4 @@
   - Was partially modified to fix some errors in formatting and references
 - [bible_converter/kjv_input](https://github.com/scrollmapper/bible_databases/tree/master/sources/en/KJV)
   - Added empty `3rd John 1:15`, as some translations split `v14` into 2 separate verses
+- [strongs/strongs_defs.csv](https://github.com/markomanninen/strongs3/tree/master)
