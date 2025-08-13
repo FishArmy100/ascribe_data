@@ -2634,7 +2634,7 @@
 { "type": "directed", "source": "Exod.3.11", "source_text": "And Moses said unto God, Who am I, that I should go unto Pharaoh, and that I should bring forth the children of Israel out of Egypt?", "targets": [ "Exod.4.10-Exod.4.13", "Exod.6.12", "1Sam.18.18", "2Sam.7.18", "1Kgs.3.7", "1Kgs.3.9", "Isa.6.5-Isa.6.8", "Jer.1.6", "Acts.7.23-Acts.7.25", "2Cor.2.16", "2Cor.3.5" ] }
 { "type": "directed", "source": "Exod.3.12", "source_text": "Certainly", "targets": [ "Exod.4.12", "Exod.4.15", "Gen.15.1", "Gen.31.3", "Deut.31.23", "Josh.1.5", "Isa.41.10", "Isa.43.2", "Matt.28.20", "Mark.16.20", "Acts.11.21", "Rom.8.31", "Heb.13.5" ] }
 { "type": "directed", "source": "Exod.3.12", "source_text": "token", "targets": [ "Exod.4.1-Exod.4.9", "Gen.15.8", "Judg.6.17", "Judg.6.21", "Judg.6.36-Judg.6.40", "Judg.7.11", "Judg.7.13", "Judg.7.14", "Ps.86.17", "Isa.7.14", "Isa.37.30", "Jer.43.9", "Jer.43.10", "Jer.51.63", "Jer.51.64" ] }
-{ "type": "directed", "source": "Exod.3.12", "source_text": "ye shall", "targets": [ "Exod.19.1-Exod.19.40", "Lev.1.1-Lev.1.27", "Num.1.1-Num.1.10" ] }
+{ "type": "directed", "source": "Exod.3.12", "source_text": "ye shall", "targets": [ "Exod.19-Exod.40", "Lev.1-Lev.27", "Num.1-Num.10" ] }
 { "type": "directed", "source": "Exod.3.13", "source_text": "What is his name", "targets": [ "Exod.3.14", "Exod.15.3", "Gen.32.29", "Judg.13.6", "Judg.13.17", "Prov.30.4", "Isa.7.14", "Isa.9.6", "Jer.23.6", "Matt.1.21", "Matt.1.23" ] }
 { "type": "directed", "source": "Exod.3.14", "source_text": "I AM hath", "targets": [ "Exod.6.3", "Job.11.7", "Ps.68.4", "Ps.90.2", "Isa.44.6", "Matt.18.20", "Matt.28.20", "John.8.58", "2Cor.1.20", "Heb.13.8", "Rev.1.4", "Rev.1.8", "Rev.1.17", "Rev.4.8" ] }
 { "type": "directed", "source": "Exod.3.15", "source_text": "The Lord", "targets": [ "Exod.3.6", "Exod.4.5", "Gen.17.7", "Gen.17.8", "Deut.1.11", "Deut.1.35", "Deut.4.1", "2Chr.28.9", "Matt.22.32", "Acts.7.32" ] }
@@ -2963,7 +2963,7 @@
 { "type": "directed", "source": "Exod.10.23", "source_text": "but all", "targets": [ "Exod.8.22", "Exod.9.4", "Exod.9.26", "Exod.14.20", "Josh.24.7", "Isa.42.16", "Isa.60.1-Isa.60.3", "Isa.65.13", "Isa.65.14", "Mal.3.18", "Col.1.13", "1Pet.2.9" ] }
 { "type": "directed", "source": "Exod.10.24", "source_text": "Go ye", "targets": [ "Exod.10.8", "Exod.10.9", "Exod.8.28", "Exod.9.28" ] }
 { "type": "directed", "source": "Exod.10.24", "source_text": "flocks", "targets": [ "Gen.34.23" ] }
-{ "type": "directed", "source": "Exod.10.25", "source_text": "sacrifices", "targets": [ "Exod.29.1-Exod.29.46", "Exod.36.1-Exod.36.40", "Lev.9.22", "Lev.16.9" ] }
+{ "type": "directed", "source": "Exod.10.25", "source_text": "sacrifices", "targets": [ "Exod.29.1-Exod.29.46", "Exod.36-Exod.40", "Lev.9.22", "Lev.16.9" ] }
 { "type": "directed", "source": "Exod.10.26", "source_text": "cattle", "targets": [ "Exod.12.32", "Isa.23.18", "Isa.60.5-Isa.60.10", "Hos.5.6", "Zech.14.20", "Acts.2.44", "Acts.2.45", "2Cor.8.5" ] }
 { "type": "directed", "source": "Exod.10.26", "source_text": "and we", "targets": [ "Prov.3.9", "Heb.11.8" ] }
 { "type": "directed", "source": "Exod.10.27", "source_text": "But the LORD hardened Pharaoh's heart, and he would not let them go.", "targets": [ "Exod.10.1", "Exod.10.20", "Exod.4.21", "Exod.14.4", "Exod.14.8", "Rev.9.20", "Rev.16.10", "Rev.16.11" ] }
@@ -4025,7 +4025,7 @@
 { "type": "directed", "source": "Exod.31.6", "source_text": "I have given", "targets": [ "Exod.4.14", "Exod.4.15", "Exod.6.26", "Ezra.5.1", "Ezra.5.2", "Eccl.4.9-Eccl.4.12", "Matt.10.2-Matt.10.4", "Luke.10.1", "Acts.13.2", "Acts.15.39", "Acts.15.40" ] }
 { "type": "directed", "source": "Exod.31.6", "source_text": "Aholiab", "targets": [ "Exod.35.34", "Exod.36.1" ] }
 { "type": "directed", "source": "Exod.31.6", "source_text": "wise hearted", "targets": [ "Exod.28.3", "Exod.35.10", "Exod.35.25", "Exod.35.26", "Exod.35.35", "Exod.36.1", "Exod.36.8", "1Kgs.3.12", "Prov.2.6", "Prov.2.7", "Jas.1.5", "Jas.1.16", "Jas.1.17" ] }
-{ "type": "directed", "source": "Exod.31.6", "source_text": "that they", "targets": [ "Exod.37.1-Exod.37.38", "Num.4.1-Num.4.49", "1Kgs.6.1-1Kgs.6.8", "2Chr.3.1-2Chr.3.4", "Ezek.43.1-Ezek.43.48" ] }
+{ "type": "directed", "source": "Exod.31.6", "source_text": "that they", "targets": [ "Exod.37-Exod.38", "Num.4.1-Num.4.49", "1Kgs.6.1-1Kgs.6.8", "2Chr.3.1-2Chr.3.4", "Ezek.43-Ezek.48" ] }
 { "type": "directed", "source": "Exod.31.7", "source_text": "tabernacle", "targets": [ "Exod.26.1-Exod.26.37", "Exod.27.9-Exod.27.19", "Exod.36.8-Exod.36.38" ] }
 { "type": "directed", "source": "Exod.31.7", "source_text": "ark", "targets": [ "Exod.25.10-Exod.25.22", "Exod.37.1-Exod.37.9" ] }
 { "type": "directed", "source": "Exod.31.8", "source_text": "the table", "targets": [ "Exod.25.23-Exod.25.30", "Exod.37.10-Exod.37.16" ] }
@@ -4411,9 +4411,9 @@
 { "type": "directed", "source": "Exod.39.29", "source_text": "a girdle", "targets": [ "Exod.28.39" ] }
 { "type": "directed", "source": "Exod.39.30", "source_text": "the plate", "targets": [ "Exod.26.36", "Exod.28.36-Exod.28.39", "1Cor.1.30", "2Cor.5.21", "Heb.1.3", "Heb.7.26" ] }
 { "type": "directed", "source": "Exod.39.30", "source_text": "HOLINESS", "targets": [ "Exod.28.36", "Zech.14.20", "Titus.2.14", "Rev.5.10" ] }
-{ "type": "directed", "source": "Exod.39.32", "source_text": "all the", "targets": [ "Exod.39.33", "Exod.39.42", "Exod.25.1-Exod.25.31", "Exod.35.1-Exod.35.40", "Lev.8.1-Lev.8.9", "Num.3.25", "Num.3.26", "Num.3.31", "Num.3.36", "Num.3.37", "Num.4.4-Num.4.32" ] }
+{ "type": "directed", "source": "Exod.39.32", "source_text": "all the", "targets": [ "Exod.39.33", "Exod.39.42", "Exod.25.1-Exod.25.31", "Exod.35-Exod.40", "Lev.8.1-Lev.8.9", "Num.3.25", "Num.3.26", "Num.3.31", "Num.3.36", "Num.3.37", "Num.4.4-Num.4.32" ] }
 { "type": "directed", "source": "Exod.39.32", "source_text": "according", "targets": [ "Exod.39.42", "Exod.39.43", "Exod.25.40", "Exod.40.32", "Deut.12.32", "1Sam.15.22", "1Chr.28.19", "Matt.28.20", "Heb.3.2", "Heb.8.5" ] }
-{ "type": "directed", "source": "Exod.39.33", "source_text": "the tent", "targets": [ "Exod.25.1-Exod.25.30", "Exod.31.7-Exod.31.11", "Exod.35.11-Exod.35.19", "Exod.36.1-Exod.36.40" ] }
+{ "type": "directed", "source": "Exod.39.33", "source_text": "the tent", "targets": [ "Exod.25.1-Exod.25.30", "Exod.31.7-Exod.31.11", "Exod.35.11-Exod.35.19", "Exod.36-Exod.40" ] }
 { "type": "directed", "source": "Exod.39.35", "source_text": "the mercy seat", "targets": [ "Exod.25.17", "Heb.9.5", "Heb.9.8" ] }
 { "type": "directed", "source": "Exod.39.36", "source_text": "the shewbread", "targets": [ "Exod.25.30", "1Kgs.7.48" ] }
 { "type": "directed", "source": "Exod.39.37", "source_text": "even with", "targets": [ "Exod.27.21", "Matt.5.14-Matt.5.16", "Phil.2.15" ] }
@@ -4615,7 +4615,7 @@
 { "type": "directed", "source": "Lev.5.2", "source_text": "touch", "targets": [ "Lev.7.21", "Lev.11.24", "Lev.11.28", "Lev.11.31", "Lev.11.39", "Num.19.11-Num.19.16", "Deut.14.8", "Isa.52.11", "Hag.2.13", "2Cor.6.17" ] }
 { "type": "directed", "source": "Lev.5.2", "source_text": "hidden", "targets": [ "Lev.5.4", "Lev.5.17", "Ps.19.12", "Luke.11.44" ] }
 { "type": "directed", "source": "Lev.5.2", "source_text": "and guilty", "targets": [ "Lev.5.17", "Lev.4.13" ] }
-{ "type": "directed", "source": "Lev.5.3", "source_text": "the uncleanness", "targets": [ "Lev.12.1-Lev.12.13", "Lev.15.1-Lev.15.33", "Lev.22.4-Lev.22.6", "Num.19.11-Num.19.16" ] }
+{ "type": "directed", "source": "Lev.5.3", "source_text": "the uncleanness", "targets": [ "Lev.12-Lev.13", "Lev.15.1-Lev.15.33", "Lev.22.4-Lev.22.6", "Num.19.11-Num.19.16" ] }
 { "type": "directed", "source": "Lev.5.4", "source_text": "to do evil", "targets": [ "Lev.27.2-Lev.27.34", "Josh.2.14", "Josh.9.15", "Judg.9.19", "Judg.11.31", "Judg.21.7", "Judg.21.18", "1Sam.1.11", "1Sam.14.24-1Sam.14.28", "1Sam.24.21", "1Sam.24.22", "1Sam.25.22", "2Sam.21.7", "2Kgs.6.31", "Ps.132.2-Ps.132.5", "Eccl.5.2-Eccl.5.6", "Ezek.17.18", "Ezek.17.19", "Matt.14.7", "Matt.14.9", "Mark.6.23", "Acts.23.12" ] }
 { "type": "directed", "source": "Lev.5.5", "source_text": "confess", "targets": [ "Lev.16.21", "Lev.26.40", "Num.5.7", "Josh.7.19", "Ezra.10.11", "Ezra.10.12", "Job.33.27", "Ps.32.5", "Prov.28.13", "Jer.3.13", "Dan.9.4", "Rom.10.10", "1John.1.8-1John.1.10" ] }
 { "type": "directed", "source": "Lev.5.6", "source_text": "trespass offering", "targets": [ "Lev.4.28", "Lev.4.32", "Lev.6.6", "Lev.7.1-Lev.7.7", "Lev.14.12", "Lev.14.13", "Lev.19.21", "Lev.19.22", "Num.6.12", "Ezek.40.39", "Ezek.42.13" ] }
@@ -5719,7 +5719,7 @@
 { "type": "directed", "source": "Num.1.51", "source_text": "the Levites", "targets": [ "Num.4.5-Num.4.33", "Num.10.11", "Num.10.17-Num.10.21" ] }
 { "type": "directed", "source": "Num.1.51", "source_text": "the stranger", "targets": [ "Num.3.10", "Num.3.38", "Num.16.40", "Num.18.22", "Lev.22.10-Lev.22.13", "1Sam.6.19", "2Sam.6.7" ] }
 { "type": "directed", "source": "Num.1.52", "source_text": "And the children of Israel shall pitch their tents, every man by his own camp, and every man by his own standard, throughout their hosts.", "targets": [ "Num.2.2", "Num.2.34", "Num.10.1-Num.10.36", "Num.24.2" ] }
-{ "type": "directed", "source": "Num.1.53", "source_text": "shall pitch", "targets": [ "Num.1.50", "Num.3.7", "Num.18.3", "1Tim.4.13-1Tim.4.16", "2Tim.4.2", "2Tim.8.19", "2Tim.16.46", "2Tim.18.5", "Lev.10.6", "1Sam.6.19", "Jer.5.31", "Jer.23.15", "Acts.20.28-Acts.20.31" ] }
+{ "type": "directed", "source": "Num.1.53", "source_text": "shall pitch", "targets": [ "Num.1.50", "Num.3.7", "Num.18.3", "1Tim.4.13-1Tim.4.16", "2Tim.4.2", "Num.8.19", "Num.16.46", "Num.18.5", "Lev.10.6", "1Sam.6.19", "Jer.5.31", "Jer.23.15", "Acts.20.28-Acts.20.31" ] }
 { "type": "directed", "source": "Num.1.53", "source_text": "and the", "targets": [ "Num.3.7", "Num.3.8", "Num.8.24-Num.8.26", "Num.18.3-Num.18.5", "Num.31.30", "Num.31.47", "1Chr.23.32", "2Chr.13.10" ] }
 { "type": "directed", "source": "Num.1.54", "source_text": "And the children of Israel did according to all that the LORD commanded Moses, so did they.", "targets": [ "Num.2.34", "Exod.23.21", "Exod.23.22", "Exod.39.32", "Exod.39.43", "Exod.40.16", "Exod.40.32", "Deut.12.32", "1Sam.15.22", "Matt.28.20" ] }
 { "type": "directed", "source": "Num.2.2", "source_text": "shall pitch", "targets": [ "Num.2.3", "Num.2.10", "Num.1.52", "Num.10.14", "Num.10.18", "Num.10.22", "Num.10.25" ] }
