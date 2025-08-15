@@ -18,7 +18,7 @@ if not ext == ".csv":
 
 print(f"Reading file: {path}...")
 data: list[list[str]] = []
-with open(path, 'r', newline='') as f:
+with open(path, 'r', newline='', encoding='utf-8') as f:
     reader = csv.reader(f)
     next(reader)
     for row in reader:
@@ -26,18 +26,13 @@ with open(path, 'r', newline='') as f:
 
 print("Writing to file: out.jsonl...")
 
-with open('strongs_defs.jsonl', 'w') as file:
-    for row in data:
-        defs = ", ".join(map(lambda d : f"\"{d.strip()}\"", row[1].split(",")))
-        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"definitions\": [{defs}] }}\n")
-        
-with open('kjv_strongs_defs.jsonl', 'w') as file:
-    for row in data:
-        defs = ", ".join(map(lambda d : f"\"{d.strip()}\"", row[2].split(",")))
-        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"definitions\": [{defs}] }}\n")
+with open('strongs_defs.jsonl', 'w', encoding='utf-8') as file:
+    for i in range(len(data)):
+        row = data[i]
+        if len(row) != 5:
+            print(f"Row {i} has {len(row)} columns")
 
-with open('strongs_derivations.jsonl', 'w') as file:
-    for row in data:
-        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"note\": [{row[4]}] }}\n")
+        defs = ", ".join(map(lambda d : f"\"{d.strip()}\"", row[3].replace("\"", "\\\"").split(",")))
+        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"definitions\": [{defs}], \"derivation\": \"{row[4].replace("\"", "\\\"")}\", \"word\": \"{row[1]}\" }}\n")
 
 print("Done!")
