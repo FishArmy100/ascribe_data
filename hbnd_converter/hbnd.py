@@ -26,9 +26,11 @@ with open(path, 'r', newline='') as f:
 
 print("Writing to file: out.jsonl...")
 
+id = 0
 with open('out.jsonl', 'w') as file:
     for row in data:
         defs = ", ".join(map(lambda d : f"\"{d.strip()}\"", row[1].split(";")))
-        file.write(f"{{ \"word\": \"{row[0]}\", \"definitions\": [{defs}] }}\n")
+        file.write(f"{{ \"term\": \"{row[0]}\", \"definitions\": [{defs}], \"id\": {id} }}\n")
+        id += 1
 
 print("Done!")

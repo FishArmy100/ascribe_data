@@ -30,7 +30,7 @@ with open(path, 'r', newline='') as f:
     reader = csv.reader(f, delimiter=",")
     next(reader)
     for row in reader:
-        print(f"{reader.line_num / line_count}%")
+        print(f"{reader.line_num / line_count * 100}%")
         from_verse = row[0]
         to_verse = row[1]
         votes = int(row[2])
@@ -39,6 +39,7 @@ with open(path, 'r', newline='') as f:
 
 print("Writing to file: out.jsonl...")
 
+id = 0
 with open('out.jsonl', 'w') as file:
     lines_data = sorted(list(data.values()), key=lambda i : i[1])
     for line in lines_data:
@@ -46,7 +47,8 @@ with open('out.jsonl', 'w') as file:
         targets = line[2]
 
         ref_str = "[ " + ", ".join(map(lambda x : f"\"{x}\"", targets)) + " ]"
-        json_str = f"{{ \"type\": \"directed\", \"source\": \"{source}\", \"targets\": {ref_str} }}\n"
+        json_str = f"{{ \"type\": \"directed\", \"source\": \"{source}\", \"targets\": {ref_str}, \"id\": {id} }}\n"
+        id += 1
 
         file.write(json_str)
 

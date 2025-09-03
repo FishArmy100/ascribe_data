@@ -26,6 +26,7 @@ with open(path, 'r', newline='', encoding='utf-8') as f:
 
 print("Writing to file: out.jsonl...")
 
+id = 0
 with open('strongs_defs.jsonl', 'w', encoding='utf-8') as file:
     for i in range(len(data)):
         row = data[i]
@@ -33,6 +34,7 @@ with open('strongs_defs.jsonl', 'w', encoding='utf-8') as file:
             print(f"Row {i} has {len(row)} columns")
 
         defs = ", ".join(map(lambda d : f"\"{d.strip()}\"", row[3].replace("\"", "\\\"").split(",")))
-        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"definitions\": [{defs}], \"derivation\": \"{row[4].replace("\"", "\\\"")}\", \"word\": \"{row[1]}\" }}\n")
+        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"definitions\": [{defs}], \"derivation\": \"{row[4].replace("\"", "\\\"")}\", \"word\": \"{row[1]}\", \"id\": {id} }}\n")
+        id += 1
 
 print("Done!")

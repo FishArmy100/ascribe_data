@@ -54,16 +54,19 @@ class DestWord:
 
 class DestVerse:
     words: List[DestWord]
-    id: str
+    verse_id: str
+    id: int
 
-    def __init__(self, id: str, words: List[DestWord]) -> None:
-        self.id = id
+    def __init__(self, words: List[DestWord], verse_id: str, id: int) -> None:
         self.words = words
+        self.verse_id = verse_id
+        self.id = id
 
     def to_json(self) -> str:
         return json.dumps({
             "id": self.id,
-            "words": [json.loads(w.to_json()) for w in self.words]
+            "verse_id": self.verse_id,
+            "words": [json.loads(w.to_json()) for w in self.words],
         }, ensure_ascii=False)
 
 class DestBible:
@@ -185,6 +188,7 @@ def split_punctuated_word(text: str) -> Tuple[str | None, str, str | None]:
 
     return begin_punc, word, end_punc
 
+index = 0
 verses: List[DestVerse] = []
 for book in bible.books:
     for chapter in book.chapters:
@@ -198,7 +202,8 @@ for book in bible.books:
                 begin_punc, text, end_punc = split_punctuated_word(w)
                 words.append(DestWord(text, None, None, begin_punc, end_punc))
 
-            verses.append(DestVerse(id, words))
+            verses.append(DestVerse(verse_id = id, words = words, id = index))
+            index += 1
     print(f"Parsed {book.name}")
 
 dest_bible = DestBible(verses)
