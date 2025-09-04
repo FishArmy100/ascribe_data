@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-from typing import List, Set
+from typing import Set
 import xml.etree.ElementTree as XML
 
 book_convert_map = {
@@ -73,7 +73,7 @@ book_convert_map = {
     "Revelation of John": "Rev",
 }
 
-def collect_tags(elem: XML.Element, tags: Set[str] = None) -> Set[str]:
+def collect_tags(elem: XML.Element, tags: Set[str] | None = None) -> Set[str]:
     if tags is None:
         tags = set()
 
@@ -98,7 +98,7 @@ if not os.path.isfile(path):
 regex = r"^(?P<prefix>I+\s+)?(?P<book>[a-zA-Z][a-zA-Z\w]*[a-zA-Z])\s+(?P<chapter>\d+):(?P<verse>\d+):\s+(?P<content>.+)$"
 verse = 'Genesis 1:1: <w savlm="strong:H07225">In the beginning</w> <w savlm="strong:H0430">God</w> <w  savlm="strong:H0853 strong:H01254">created</w> <w savlm="strong:H08064">the heaven</w> <w savlm="strong:H0853">and</w> <w savlm="strong:H0776">the earth</w>.'
 
-tags = set()
+tags = set[str]()
 with open(path, 'r', encoding='utf-8-sig') as file:
     lines = file.readlines()
     lines = lines[:-1]
