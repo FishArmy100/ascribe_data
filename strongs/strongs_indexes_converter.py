@@ -8,7 +8,7 @@ from pathlib import Path
 from sys import stdout
 import string
 
-regex = r"^(?P<prefix>I+\s+)?(?P<book>[a-zA-Z][a-zA-Z\s]*[a-zA-Z])\s+(?P<chapter>\d+):(?P<verse>\d+):\s+(?P<content>.+)$"
+regex = r"^(?P<prefix>I+\s+)?(?P<book>[a-zA-Z][a-zA-Z\s]*[a-zA-Z])\s+(?P<chapter>\d+):(?P<verse>\d+):\s+(?P<content>.+)?$"
 
 book_convert_map = {
     "Genesis": "Gen",
@@ -237,7 +237,7 @@ def get_strongs(entry: OsisStrongs, bible: Dict[str, Verse], line: int) -> str:
     offset = len(bible[entry.osis].words) - total_words + 1  # 1-based indexing
 
     if offset < 0:
-        raise RuntimeError(f"Words in strongs more than in bible on line {line}")
+        raise RuntimeError(f"Words in strongs more than in bible on line {line}, s_word = {total_words}; b_word = {len(bible[entry.osis].words)}; ref = {entry.osis}")
 
     strongs_words: List[str] = []
 
@@ -325,6 +325,7 @@ if __name__ == "__main__": # Main entry point
 
         
     out_lines: List[str] = []
+    error_count = 0
 
     with open(path, 'r', encoding='utf-8-sig') as file:
         lines = file.readlines()
@@ -340,6 +341,11 @@ if __name__ == "__main__": # Main entry point
             book = captures["book"]
             chapter = int(captures["chapter"])
             verse = int(captures["verse"])
+            content: str | None = captures['content']
+            if content is None:
+                line_index += 1
+                continue
+
             content = f"<content>{captures['content']}</content>"
 
             if prefix:
@@ -351,13 +357,19 @@ if __name__ == "__main__": # Main entry point
             tree = XML.fromstring(content)
             entry = OsisStrongs(osis, tree)
 
-            out_lines.append(get_strongs(entry, bible, line_index))
+            try:
+                out_lines.append(get_strongs(entry, bible, line_index))
+            except RuntimeError as e:
+                error_count += 1
+                print(e)
+                
             
-            print_progress_bar(line_index, total_lines)
+            #print_progress_bar(line_index, total_lines)
             line_index += 1
 
     out_file = "\n".join(out_lines)
 
+    print(f"Error count: {error_count}")
     print("Writing to out file...")
     write_to_file(out_path, out_file)
     print("Jobs done!")

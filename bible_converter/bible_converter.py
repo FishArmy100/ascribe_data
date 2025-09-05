@@ -210,7 +210,7 @@ dest_bible = DestBible(verses)
 
 print("Writing to file...")
 
-with open('out.jsonl', 'w', encoding='utf-8') as file:
+with open('out_asv.jsonl', 'w', encoding='utf-8') as file:
     file.write(dest_bible.to_jsonl())
 
 print("Done!")
