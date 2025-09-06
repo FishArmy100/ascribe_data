@@ -2,7 +2,7 @@ import subprocess
 
 # Run the diatheke command
 result = subprocess.run(
-    ["diatheke", "-b", "ASV", "-k", "Genesis 1:1", "-f", "OSIS"],
+    ["diatheke", "-b", "KJV", "-k", "Genesis 1:1", "-f", "OSIS"],
     capture_output=True,
     text=True,
     encoding="utf-8"

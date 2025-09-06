@@ -364,12 +364,12 @@ if __name__ == "__main__": # Main entry point
                 print(e)
                 
             
-            #print_progress_bar(line_index, total_lines)
+            print_progress_bar(line_index, total_lines)
             line_index += 1
 
     out_file = "\n".join(out_lines)
 
-    print(f"Error count: {error_count}")
+    # print(f"Error count: {error_count}")
     print("Writing to out file...")
     write_to_file(out_path, out_file)
     print("Jobs done!")
