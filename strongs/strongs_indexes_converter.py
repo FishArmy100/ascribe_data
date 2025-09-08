@@ -358,7 +358,7 @@ if __name__ == "__main__": # Main entry point
             entry = OsisStrongs(osis, tree)
 
             try:
-                out_lines.append(get_strongs(entry, bible, line_index))
+                out_lines.append(get_strongs(entry, bible, line_index)) 
             except RuntimeError as e:
                 error_count += 1
                 print(e)
