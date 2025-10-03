@@ -2,6 +2,7 @@ import sys
 import os
 import csv
 from typing import List, Tuple, Dict
+import re
 
 if len(sys.argv) < 2:
     raise RuntimeError("You must pass a file path")
@@ -45,6 +46,12 @@ with open('out.jsonl', 'w') as file:
     for line in lines_data:
         source = line[0]
         targets = line[2]
+
+        for i in range(0, len(targets)):
+            t = targets[i]
+            m = re.match(r"(?P<b1>\d?[a-zA-Z]+)(\.\d+)?(\.\d+)?(\#\d+)?-(?P<b2>\d?[a-zA-Z]+)(\.\d+)?(\.\d+)?(\#\d+)?", t)
+            if m and m.group("b1") != m.group("b2"):
+                targets[i] = t + ":KJV"
 
         ref_str = "[ " + ", ".join(map(lambda x : f"\"{x}\"", targets)) + " ]"
         json_str = f"{{ \"type\": \"directed\", \"source\": \"{source}\", \"targets\": {ref_str}, \"id\": {id} }}\n"
