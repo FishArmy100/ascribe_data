@@ -78,8 +78,8 @@ def format_passage(passage: str) -> str:
     # 1. Handle book ranges: e.g., "2 John-3 John"
     match = re.match(r'(\d?\s?\w+)\s*-\s*(\d?\s?\w+)', passage)
     if match and any(c.isalpha() for c in match.group(2)):
-        start_book = BOOK_MAP.get(match.group(1).replace(" ", ""), match.group(1).replace(" ", ""))
-        end_book = BOOK_MAP.get(match.group(2).replace(" ", ""), match.group(2).replace(" ", ""))
+        start_book = BOOK_MAP.get(match.group(1), match.group(1))
+        end_book = BOOK_MAP.get(match.group(2), match.group(2))
         return f"{start_book}-{end_book}"
 
     # 2. Handle chapter ranges within the same book: "Genesis 1-2"

@@ -94,8 +94,15 @@ def format_passage(passage: str) -> str:
         chapter = match.group(2)
         return f"{book}.{chapter}.{match.group(3)}-{book}.{chapter}.{match.group(4)}"
     
-    # 4. Handle verse ranges across chapters: "1Kings 15:25-16:34"
-    match = re.match(r'(.+?)\s+(\d+):(\d+)-\s+(\d+):(\d+)$', passage)
+    # 4. Handle verse ranges across chapters: "Luke 16-17:10"
+    match = re.match(r'(.+?)\s+(\d+)-(\d+):(\d+)$', passage)
+    if match:
+        book = BOOK_MAP.get(match.group(1).strip(), match.group(1).strip())
+        chapter = match.group(2)
+        return f"{book}.{match.group(2)}-{book}.{match.group(3)}.{match.group(4)}"
+    
+    # 5. Handle verse ranges across chapters: "1Kings 15:25-16:34"
+    match = re.match(r'(.+?)\s+(\d+):(\d+)-(\d+):(\d+)$', passage)
     if match:
         book = BOOK_MAP.get(match.group(1).strip(), match.group(1).strip())
         start_chapter = match.group(2).strip()
@@ -104,14 +111,14 @@ def format_passage(passage: str) -> str:
         end_verse = match.group(5).strip()
         return f"{book}.{start_chapter}.{start_verse}-{book}.{end_chapter}.{end_verse}"
 
-    # 5. Single chapter or chapter:verse
+    # 6. Single chapter or chapter:verse
     match = re.match(r'(.+?)\s+([\d:]+)$', passage)
     if match:
         book = BOOK_MAP.get(match.group(1).strip(), match.group(1).strip())
         ref = match.group(2).replace(":", ".")
         return f"{book}.{ref}"
 
-    # 6. Only book
+    # 7. Only book
     return BOOK_MAP.get(passage.strip(), passage.strip())
 
 
