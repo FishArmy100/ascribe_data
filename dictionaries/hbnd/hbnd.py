@@ -29,8 +29,8 @@ print("Writing to file: out.jsonl...")
 id = 0
 with open('out.jsonl', 'w') as file:
     for row in data:
-        defs = ", ".join(map(lambda d : f"\"{d.strip()}\"", row[1].split(";")))
-        file.write(f"{{ \"term\": \"{row[0]}\", \"definitions\": [{defs}], \"id\": {id} }}\n")
+        defs = row[1]
+        file.write(f"{{ \"term\": \"{row[0]}\", \"definition\": \"<p>{defs}</p>\", \"id\": {id} }}\n")
         id += 1
 
 print("Done!")

@@ -33,8 +33,8 @@ with open('strongs_defs.jsonl', 'w', encoding='utf-8') as file:
         if len(row) != 5:
             print(f"Row {i} has {len(row)} columns")
 
-        defs = ", ".join(map(lambda d : f"\"{d.strip()}\"", row[3].replace("\"", "\\\"").split(",")))
-        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"definitions\": [{defs}], \"derivation\": \"{row[4].replace("\"", "\\\"")}\", \"word\": \"{row[1]}\", \"id\": {id} }}\n")
+        def_str = f"<h2><b>Definitions:</b></h2><p>{row[3].replace("\"", "\\\"")}</p><br><h2><b>Derivation:</b></h2><p>{row[4].replace("\"", "\\\"")}</p>"
+        file.write(f"{{ \"strongs_ref\": \"{row[0]}\", \"definition\": \"{def_str}\", \"word\": \"{row[1]}\", \"id\": {id} }}\n")
         id += 1
 
 print("Done!")
