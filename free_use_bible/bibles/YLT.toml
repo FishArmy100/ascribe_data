@@ -1,4 +1,6 @@
 name = "Young's Literal Translation"
+license = "https://ebible.org/Scriptures/details.php?id=engylt"
+language = "eng"
 
 [books]
 Gen = "Genesis"

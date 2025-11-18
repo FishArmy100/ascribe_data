@@ -1,4 +1,6 @@
 name = "Berean Standard Bible"
+license = "https://berean.bible/"
+language = "eng"
 
 [books]
 Gen = "Genesis"

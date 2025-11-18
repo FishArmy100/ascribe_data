@@ -78,9 +78,8 @@ async function run()
 async function convert_bible(translation: string): Promise<VerseJson[]>
 {
     const books = await bible.fetch_books_in_translation(translation);
-    let id = 0;
 
-    return Promise.all(books.books.filter(b => !b.isApocryphal).map(async b => {
+    const verses =  await Promise.all(books.books.filter(b => !b.isApocryphal).map(async b => {
         const book_verses = Promise.all(range(1, b.numberOfChapters + 1).map(async c => {
             const chapter = await bible.fetch_chapter_in_translation(translation, b.id, c);
             return chapter.chapter.content
@@ -88,12 +87,18 @@ async function convert_bible(translation: string): Promise<VerseJson[]>
                 .map(c => {
                     const book_name = bible.get_osis(b.id as bible.BibleBook);
                     const chapter_number = chapter.chapter.number;
-                    return convert_verse(book_name, chapter_number, c, id++);
+                    return convert_verse(book_name, chapter_number, c, 0);
                 });
         }));
         console.log(`Completed book ${b.name}`);
         return book_verses;
     })).then(p => p.flatMap(x => x).flatMap(x => x))
+
+    verses.forEach((v, i) => {
+        v.id = i;
+    })
+
+    return verses;
 }
 
 async function convert_config(translation: bible.Translation): Promise<BibleConfig>
@@ -101,6 +106,8 @@ async function convert_config(translation: bible.Translation): Promise<BibleConf
     const books = await bible.fetch_books_in_translation(translation.id);
     return {
         name: translation.name,
+        license: translation.licenseUrl,
+        language: translation.language,
         books: Object.fromEntries(books.books.map(b => [bible.get_osis(b.id as bible.BibleBook), b.name]))
     }
 }

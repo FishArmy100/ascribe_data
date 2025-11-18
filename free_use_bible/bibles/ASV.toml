@@ -1,4 +1,6 @@
 name = "American Standard Version (1901)"
+license = "https://ebible.org/Scriptures/details.php?id=eng-asv"
+language = "eng"
 
 [books]
 Gen = "Genesis"
