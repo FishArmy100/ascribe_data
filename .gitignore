@@ -182,4 +182,4 @@ cython_debug/
 
 .vscode/
 
-node_modules/
+node_modules
