@@ -181,3 +181,5 @@ cython_debug/
 .cursorindexingignore
 
 .vscode/
+
+node_modules/
