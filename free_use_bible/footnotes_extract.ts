@@ -2,7 +2,12 @@ import minimist from "minimist";
 import * as interop from "./interop";
 
 type CommentaryConfig = {
-
+    name: string,
+    description: string,
+    bible: string,
+    language: string,
+    data_source: string,
+    license: string,
 }
 
 type Args = {
