@@ -1,6 +1,0 @@
-name = "Young's Literal Translation Footnotes"
-description = "Footnotes based on the \"Young's Literal Translation\" Bible"
-bible = "Young's Literal Translation"
-license = "https://ebible.org/Scriptures/details.php?id=engylt"
-language = "eng"
-data_source = "https://ebible.org/Scriptures/details.php?id=engylt"

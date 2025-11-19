@@ -53,12 +53,12 @@ async function run()
 
     const commentary = await convert_footnotes(translation);
     const commentary_src = commentary.map(v => JSON.stringify(v)).join("\n");
-    const commentary_path = `${args.op}/${args.name}.jsonl`;
+    const commentary_path = `${args.op}/${args.name.toLocaleLowerCase()}-footnotes.jsonl`;
     const p1 = fs.outputFile(commentary_path, commentary_src);
 
     const config = convert_config(translation);
     const config_src = toml.stringify(JSON.parse(JSON.stringify(config)));
-    const config_path = `${args.op}/${args.name}.toml`;
+    const config_path = `${args.op}/${args.name.toLocaleLowerCase()}-footnotes.toml`;
     const p2 = fs.outputFile(config_path, config_src);
 
     Promise.all([p1, p2]).then(_ => {
