@@ -10,6 +10,12 @@ type CommentaryConfig = {
     license: string,
 }
 
+type CommentaryEntry = {
+    id: number,
+    references: string[],
+    comment: string,
+}
+
 type Args = {
     name?: string,
     lang?: string,
@@ -40,6 +46,18 @@ async function run()
     {
         console.error(`[ERROR]: Unknown book ${args.name}`);
         return;
+    }
+}
+
+function convert_config(translation: interop.Translation): CommentaryConfig
+{
+    return {
+        name: `${translation.name} Footnotes`,
+        description: `Footnotes based on the "${translation.name}" Bible`,
+        bible: translation.name,
+        license: translation.licenseUrl,
+        language: translation.language,
+        data_source: translation.website,
     }
 }
 

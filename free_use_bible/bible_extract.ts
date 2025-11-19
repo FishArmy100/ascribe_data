@@ -147,22 +147,25 @@ function split_punctuated_word(text: string): [string | null, string, string | n
     // Match beginning punctuation, word text, and ending punctuation
     const match = text.match(/^(\W*)(\w+)(\W*)$/);
     
-    let beginPunc: string | null;
+    let begin_punc: string | null;
     let word: string;
-    let endPunc: string | null;
+    let end_punc: string | null;
 
-    if (match) {
-        beginPunc = match[1] || null;
+    if (match) 
+    {
+        begin_punc = match[1] || null;
         word = match[2];
-        endPunc = match[3] || null;
-    } else {
+        end_punc = match[3] || null;
+    } 
+    else 
+    {
         // If the text doesn't contain any word characters
-        beginPunc = null;
+        begin_punc = null;
         word = text;
-        endPunc = null;
+        end_punc = null;
     }
 
-    return [beginPunc, word, endPunc];
+    return [begin_punc, word, end_punc];
 }
 
 
