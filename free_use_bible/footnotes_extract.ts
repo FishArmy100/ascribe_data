@@ -1,6 +1,8 @@
 import minimist from "minimist";
 import * as interop from "./interop";
-import { OsisBook } from "./utils";
+import { OsisBook, range } from "./utils";
+import fs from "fs-extra";
+import toml from "@iarna/toml";
 
 type CommentaryConfig = {
     name: string,
@@ -48,6 +50,20 @@ async function run()
         console.error(`[ERROR]: Unknown book ${args.name}`);
         return;
     }
+
+    const commentary = await convert_footnotes(translation);
+    const commentary_src = commentary.map(v => JSON.stringify(v)).join("\n");
+    const commentary_path = `${args.op}/${args.name}.jsonl`;
+    const p1 = fs.outputFile(commentary_path, commentary_src);
+
+    const config = convert_config(translation);
+    const config_src = toml.stringify(JSON.parse(JSON.stringify(config)));
+    const config_path = `${args.op}/${args.name}.toml`;
+    const p2 = fs.outputFile(config_path, config_src);
+
+    Promise.all([p1, p2]).then(_ => {
+        console.log(`Done!:\n - SRC = ${commentary_path}\n - CONFIG = ${config_path}`);
+    })
 }
 
 function convert_config(translation: interop.Translation): CommentaryConfig
@@ -62,7 +78,28 @@ function convert_config(translation: interop.Translation): CommentaryConfig
     }
 }
 
-function convert_footnote(book: OsisBook, chapter: number, footnote: interop.ChapterFootnote, id: number): CommentaryEntry
+async function convert_footnotes(translation: interop.Translation): Promise<CommentaryEntry[]>
+{
+    let books = await interop.fetch_books_in_translation(translation.id);
+    const entries = await Promise.all(books.books.map(async b => {
+        const entries = await Promise.all(range(1, b.numberOfChapters + 1).map(async c => {
+            const chapter = await interop.fetch_chapter_in_translation(translation.id, b.id, c);
+            return chapter.chapter.footnotes.map(f => {
+                const book_name = interop.get_osis(b.id as interop.BibleBook);
+                return convert_footnote(book_name, c, f, 0);
+            })
+        }));
+        console.log(`Completed book ${b.name}`);
+        return entries
+    }))
+
+    return entries.flatMap(x => x).flatMap(x => x).map((e, i) => {
+        e.id = i;
+        return e;
+    });
+}
+
+function convert_footnote(book: string, chapter: number, footnote: interop.ChapterFootnote, id: number): CommentaryEntry
 {
     let references = footnote.reference ? 
         [`${book}.${chapter}.${footnote.reference.verse}`] : 

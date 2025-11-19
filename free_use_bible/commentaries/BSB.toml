@@ -1,0 +1,6 @@
+name = "Berean Standard Bible Footnotes"
+description = 'Footnotes based on the "Berean Standard Bible" Bible'
+bible = "Berean Standard Bible"
+license = "https://berean.bible/"
+language = "eng"
+data_source = "https://berean.bible/"

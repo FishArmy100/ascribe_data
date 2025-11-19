@@ -1,0 +1,6 @@
+name = "King James (Authorized) Version Footnotes"
+description = 'Footnotes based on the "King James (Authorized) Version" Bible'
+bible = "King James (Authorized) Version"
+license = "https://ebible.org/Scriptures/details.php?id=eng-kjv2006"
+language = "eng"
+data_source = "https://ebible.org/Scriptures/details.php?id=eng-kjv2006"
