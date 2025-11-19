@@ -1,5 +1,6 @@
 import minimist from "minimist";
 import * as interop from "./interop";
+import { OsisBook } from "./utils";
 
 type CommentaryConfig = {
     name: string,
@@ -58,6 +59,19 @@ function convert_config(translation: interop.Translation): CommentaryConfig
         license: translation.licenseUrl,
         language: translation.language,
         data_source: translation.website,
+    }
+}
+
+function convert_footnote(book: OsisBook, chapter: number, footnote: interop.ChapterFootnote, id: number): CommentaryEntry
+{
+    let references = footnote.reference ? 
+        [`${book}.${chapter}.${footnote.reference.verse}`] : 
+        [`${book}.${chapter}`];
+
+    return {
+        references,
+        comment: footnote.text,
+        id
     }
 }
 
