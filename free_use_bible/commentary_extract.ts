@@ -3,6 +3,8 @@ import * as interop from "./interop";
 import { range } from "./utils";
 import fs from "fs-extra"
 import toml from "@iarna/toml"
+import * as tp from "./process.ts"
+import pLimit from "p-limit";
 
 type CommentaryConfig = {
     name: string,
@@ -78,6 +80,8 @@ async function run()
     })
 }
 
+const limit = pLimit(4);
+
 async function convert_commentary(commentary: interop.Commentary): Promise<CommentaryEntry[]>
 {
     const entries: CommentaryEntry[] = [];
@@ -93,13 +97,21 @@ async function convert_commentary(commentary: interop.Commentary): Promise<Comme
             const chapter = (await interop.fetch_commentary_book_chapter(commentary.id, book.id, i)).chapter;        
             if (chapter.introduction)
             {
-                entries.push({ references: [`${book_name}.${chapter.number}`], comment: chapter.introduction, id: 0 })
+                const content = tp.raw_text_to_html_text(chapter.introduction, {
+                    ref_context: { book: book_name, chapter: chapter.number }
+                });
+
+                entries.push({ references: [`${book_name}.${chapter.number}`], comment: content, id: 0 })
             }
 
             chapter.content.forEach(v => {
                 if (typeof(v.content[0]) === "string")
                 {
-                    entries.push({ references: [`${book_name}.${chapter.number}.${v.number}`], comment: v.content[0], id: 0 })
+                    const content = tp.raw_text_to_html_text(v.content[0], {
+                        ref_context: { book: book_name, chapter: chapter.number }
+                    });
+
+                    entries.push({ references: [`${book_name}.${chapter.number}.${v.number}`], comment: content, id: 0 })
                 }
             })
         }))

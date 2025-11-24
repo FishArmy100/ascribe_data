@@ -1,5 +1,5 @@
 import { group } from "console"
-import { OsisBook, range } from "./utils"
+import { OsisBook, range } from "../utils"
 
 type BookInfo = {
     aliases?: string[],

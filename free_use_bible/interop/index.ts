@@ -1,3 +1,5 @@
+import { fetch, Agent } from "undici";
+
 export * from "./translations.ts";
 export * from "./books.ts";
 export * from "./chapter.ts"
@@ -5,14 +7,53 @@ export * from "./commentaries.ts";
 
 export const BASE_URL = "https://bible.helloao.org/api"; 
 
-export async function fetch_json<T>(url: string): Promise<T>
-{
-    const res = await fetch(url);
-    if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+const agent = new Agent({
+    connect: {
+        timeout: 60_000,
+    },
+    bodyTimeout: 0,
+    headersTimeout: 0,
+})
+
+export async function fetch_json<T>(url: string, retries = 5): Promise<T> {
+    for (let attempt = 1; attempt <= retries; attempt++) 
+    {
+        try 
+        {
+            const res = await fetch(url, { dispatcher: agent });
+
+            if (!res.ok) 
+            {
+                throw new Error(`HTTP error ${res.status} on ${url}`);
+            }
+
+            return (await res.json()) as T;
+        } 
+        catch (err: any) 
+        {
+            const is_last_attempt = attempt === retries;
+
+            // These are transient errors — retry
+            if (
+                err?.cause?.code === "UND_ERR_SOCKET" ||
+                err?.cause?.code === "UND_ERR_CONNECT_TIMEOUT" ||
+                err?.code === "ECONNRESET"
+            ) {
+                if (is_last_attempt) throw err;
+
+                // small delay with exponential backoff
+                const delay = 300 * attempt;
+                await new Promise(r => setTimeout(r, delay));
+                continue;
+            }
+
+            // Other errors → do not retry
+            throw err;
+        }
     }
 
-    return (await res.json()) as T;
+    // Should never reach here
+    throw new Error(`Failed to fetch ${url} after ${retries} retries`);
 }
 
 export type BibleBook = 
