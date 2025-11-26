@@ -3,7 +3,7 @@ import * as interop from "./interop";
 import { range } from "./utils";
 import fs from "fs-extra"
 import toml from "@iarna/toml"
-import * as tp from "./process.ts"
+import * as tp from "./process"
 import pLimit from "p-limit";
 
 type CommentaryConfig = {
@@ -26,6 +26,7 @@ type Args = {
     name?: string,
     lang?: string,
     op?: string,
+    format?: boolean,
 }
 
 async function run()
@@ -55,6 +56,11 @@ async function run()
         return;
     }
 
+    if (args.format === undefined)
+    {
+        args.format = true;
+    }
+
     const commentary_data = (await interop.fetch_available_commentaries())
         .filter(t => args.lang ? args.lang === t.language : true)
         .find(t => t.id === args.name)
@@ -65,9 +71,9 @@ async function run()
         return;
     }
 
-    const commentary = await convert_commentary(commentary_data);
+    const commentary = await convert_commentary(commentary_data, args.format);
     const commentary_src = commentary.map(v => JSON.stringify(v)).join("\n");
-    const commentary_path = `${args.op}/${args.name.toLocaleLowerCase()}-commentary.jsonl`;
+    const commentary_path = `${args.op}/${args.name.toLocaleLowerCase()}-commentary${!args.format ? "-unformatted" : ""}.jsonl`;
     const p1 = fs.outputFile(commentary_path, commentary_src);
 
     const config = convert_config(commentary_data);
@@ -80,48 +86,68 @@ async function run()
     })
 }
 
-const limit = pLimit(4);
-
-async function convert_commentary(commentary: interop.Commentary): Promise<CommentaryEntry[]>
+async function convert_commentary(commentary: interop.Commentary, format: boolean,): Promise<CommentaryEntry[]>
 {
-    const entries: CommentaryEntry[] = [];
-    let books = await interop.fetch_books_in_commentary(commentary.id);
-    await Promise.all(books.map(async book => {
+    const books = await interop.fetch_books_in_commentary(commentary.id);
+    const entries = (await Promise.all(books.map(async book => {
         const book_name = interop.get_osis(book.id as interop.BibleBook);
+
+        const entries = (await Promise.all(range(1, book.numberOfChapters + 1).map(async i => {
+            const chapter = (await interop.fetch_commentary_book_chapter(commentary.id, book.id, i)).chapter;        
+            
+            const entries = chapter.content.map(v => {
+                if (typeof(v.content[0]) === "string")
+                {
+                    const content = v.content[0];
+                    return { references: [`${book_name}.${chapter.number}.${v.number}`], comment: content, id: 0 }
+                }
+                else 
+                {
+                    return null;
+                }
+            }).filter(v => v !== null);
+
+            if (chapter.introduction)
+            {
+                const content = chapter.introduction;
+                entries.push({ references: [`${book_name}.${chapter.number}`], comment: content, id: 0 })
+            }
+
+            return entries
+        }))).flatMap(x => x)
+
         if (book.introduction)
         {
             entries.push({ references: [book_name], comment: book.introduction, id: 0 })
         }
 
-        await Promise.all(range(1, book.numberOfChapters + 1).map(async i => {
-            const chapter = (await interop.fetch_commentary_book_chapter(commentary.id, book.id, i)).chapter;        
-            if (chapter.introduction)
-            {
-                const content = tp.raw_text_to_html_text(chapter.introduction, {
-                    ref_context: { book: book_name, chapter: chapter.number }
-                });
-
-                entries.push({ references: [`${book_name}.${chapter.number}`], comment: content, id: 0 })
-            }
-
-            chapter.content.forEach(v => {
-                if (typeof(v.content[0]) === "string")
-                {
-                    const content = tp.raw_text_to_html_text(v.content[0], {
-                        ref_context: { book: book_name, chapter: chapter.number }
-                    });
-
-                    entries.push({ references: [`${book_name}.${chapter.number}.${v.number}`], comment: content, id: 0 })
-                }
-            })
-        }))
-
-        console.log(`Completed book ${book.name}`);
-    }))
+        console.log(`Fetched book ${book.name}`);
+        return entries;
+    }))).flatMap(x => x)
     
     entries.forEach((e, i) => {
         e.id = i
     });
+
+    console.log("Processing text....");
+    if(format)
+    {
+        await Promise.all(
+            entries.map(async (e, i) => {
+                let ref = e.references.length === 1
+                    ? tp.parse_reference(e.references[0], 0, e.references[0].length - 1)
+                    : null;
+
+                if (ref) {
+                    e.comment = tp.raw_text_to_html_text(e.comment);
+                } else {
+                    e.comment = tp.raw_text_to_html_text(e.comment);
+                }
+
+                console.log(`Progress: %${(i / entries.length) * 100}`);
+            })
+        );
+    }
 
     return entries
 }

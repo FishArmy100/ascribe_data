@@ -20,7 +20,7 @@ const BOOK_ARRAY: { [name: string]: BookInfo } = {
     "1 Kings": { osis: "1Kgs", aliases: [ "Kng", "Kngs" ] },
     "2 Kings": { osis: "2Kgs", aliases: [ "Kng", "Kngs" ] },
     "1 Chronicles": { osis: "1Chr" },
-    "2 Chronicles": { osis: "1Chr" },
+    "2 Chronicles": { osis: "2Chr" },
     "Ezra": { osis: "Ezra" },
     "Nehemiah": { osis: "Neh" },
     "Esther": { osis: "Esth" },
@@ -96,13 +96,12 @@ export function find_verses(text: string): FoundVerse[]
     }).filter(x => x !== null);
 }
 
-
-const CHAPTER_REGEX_STR         = `(${build_all_book_regex_str()})\\s+(\\d+)`;
-const CHAPTER_OSIS_REGEX_STR    = `(${build_all_book_regex_str()}).(\\d+)`;
-const CHAPTER_RANGE_REGEX_STR   = `(${build_all_book_regex_str()})\\s+(\\d+)\\s*-\\s*(\\d+)`;
-const VERSE_REGEX_STR           = `(${build_all_book_regex_str()})\\s+(\\d+)\\s+(:)?\\s+(\\d+)`;
-const VERSE_OSIS_REGEX_STR      = `(${build_all_book_regex_str()}).(\\d+).(\\d+)`;
-const VERSE_RANGE_REGEX_STR     = `(${build_all_book_regex_str()})\\s+(\\d+)\\s*(:|\\s)\\s*(\\d+)\\s*-\\s*(\\d+)`;
+const CHAPTER_REGEX_STR         = `\\b(${build_all_book_regex_str()})\\s+(\\d+)(?=\\s|$|[^\\d:.,])`;
+const CHAPTER_OSIS_REGEX_STR    = `\\b(${build_all_book_regex_str()}).(\\d+)\\b`;
+const CHAPTER_RANGE_REGEX_STR   = `\\b(${build_all_book_regex_str()})\\s+(\\d+)\\s*-\\s*(\\d+)\\b`;
+const VERSE_REGEX_STR           = `\\b(${build_all_book_regex_str()})\\s+(\\d+)\\s*:?\\s*(\\d+)(?=\\s|$|[^\\d])`;
+const VERSE_OSIS_REGEX_STR      = `\\b(${build_all_book_regex_str()})\\.(\\d+)\\.(\\d+)\\b`;
+const VERSE_RANGE_REGEX_STR     = `\\b(${build_all_book_regex_str()})\\s+(\\d+)\\s*(:|\\s)\\s*(\\d+)\\s*-\\s*(\\d+)\\b`;
 export const REFERENCE_REGEX = RegExp(`(${VERSE_RANGE_REGEX_STR}|${VERSE_OSIS_REGEX_STR}|${VERSE_REGEX_STR}|${CHAPTER_RANGE_REGEX_STR}|${CHAPTER_OSIS_REGEX_STR}|${CHAPTER_REGEX_STR})`, "g");
 
 
@@ -235,15 +234,13 @@ function build_book_regex_str(name: string, book: BookInfo): string
             ordinal = "3rd"
         }
 
-        const extra = permutations.map(p => [
-            prefix + " " + p,
-            p + " " + prefix,
-            "I".repeat(prefix) + " " + p,
-            ordinal + " " + p
-        ]).flatMap(x => x)
-
-        return permutations
-            .concat(extra)
+        return permutations.map(p => [
+                prefix + " " + p,
+                p + " " + prefix,
+                "I".repeat(prefix) + " " + p,
+                ordinal + " " + p
+            ])
+            .flatMap(x => x)
             .map(text_to_regex)
             .join("|")
     }
