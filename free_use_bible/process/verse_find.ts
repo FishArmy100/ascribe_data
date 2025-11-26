@@ -17,8 +17,8 @@ const BOOK_ARRAY: { [name: string]: BookInfo } = {
     "Ruth": { osis: "Ruth" },
     "1 Samuel": { osis: "1Sam" },
     "2 Samuel": { osis: "2Sam" },
-    "1 Kings": { osis: "1Kgs", aliases: [ "Kng", "Kngs" ] },
-    "2 Kings": { osis: "2Kgs", aliases: [ "Kng", "Kngs" ] },
+    "1 Kings": { osis: "1Kgs", aliases: [ "Kng", "Kngs", "Kg" ] },
+    "2 Kings": { osis: "2Kgs", aliases: [ "Kng", "Kngs", "Kg" ] },
     "1 Chronicles": { osis: "1Chr" },
     "2 Chronicles": { osis: "2Chr" },
     "Ezra": { osis: "Ezra" },
@@ -236,7 +236,7 @@ function build_book_regex_str(name: string, book: BookInfo): string
 
         return permutations.map(p => [
                 prefix + " " + p,
-                p + " " + prefix,
+                p + prefix,
                 "I".repeat(prefix) + " " + p,
                 ordinal + " " + p
             ])
@@ -286,7 +286,13 @@ function letter_to_regex(letter: string): string
 
 function test()
 {
-    "Gen 1:1-2".match(VERSE_RANGE_REGEX_STR);
+    const error_cases: string[] = [
+        "the2 000"
+    ];
+
+    error_cases.forEach(c => {
+        console.log(find_verses(c))
+    });
 }
 
-test();
+// test();

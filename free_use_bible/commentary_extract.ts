@@ -9,7 +9,6 @@ import pLimit from "p-limit";
 type CommentaryConfig = {
     name: string,
     description?: string,
-    bible: string,
     language: string,
     data_source: string,
     license: string,
@@ -156,7 +155,6 @@ function convert_config(commentary: interop.Commentary): CommentaryConfig
 {
     return {
         name: `${commentary.name}`,
-        bible: commentary.name,
         license: commentary.licenseUrl,
         language: commentary.language,
         data_source: commentary.website,
