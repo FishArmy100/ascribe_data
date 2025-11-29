@@ -1,6 +1,5 @@
 import fs from "fs-extra";
 import * as toml from "@iarna/toml";
-import { verse_find } from "../../shared_utils";
 
 type EastonRawEntry = {
     term: string,
@@ -71,6 +70,8 @@ async function run()
 
     const entry_map = new Map<string, number>(raw_entries.map((e, i) => [e.term.toLocaleLowerCase(), i]));
 
+    console.log(process_text("Here is some text Gen 1:5, 12; 4:5", new Map()));
+
     const converted_entries = raw_entries.map((e, i, arr) => {
         console.log((i / arr.length) * 100);
         return convert_entry(e, i, entry_map);
@@ -106,15 +107,8 @@ function process_definitions(definitions: string[], id_map: Map<string, number>)
 
 function process_text(text: string, id_map: Map<string, number>): string 
 {
-    const map = new Map<string, number>();
-    text = text.replaceAll(verse_find.REFERENCE_REGEX, (sub) => {
-        const pos = map.get(text) ?? 0;
-        const start = text.indexOf(sub, pos);
-        const end = start + sub.length - 1;
-        const verse = verse_find.parse_reference(sub, start, end)!;
-        map.set(sub, pos + 1);
-        return `<a href="${verse.ref_id}">${sub}</a>`;
-    });
+    const verses = find_verses(text);
+    // text = replace_verse_segments_formatted(text, verses);
 
     const inner_reference_regex = /\[(\d+)\](\w+)/g;
     text = text.replaceAll(inner_reference_regex, (_, _num, term_raw) => {
@@ -137,3 +131,7 @@ function process_text(text: string, id_map: Map<string, number>): string
 }
 
 run()
+
+function find_verses(text: string) {
+    throw new Error("Function not implemented.");
+}

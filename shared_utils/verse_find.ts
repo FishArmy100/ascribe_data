@@ -96,12 +96,12 @@ export function find_verses(text: string): FoundVerse[]
     }).filter(x => x !== null);
 }
 
-const CHAPTER_REGEX_STR         = `\\b(${build_all_book_regex_str()})\\s+(\\d+)(?=\\s|$|[^\\d:.,])`;
+const CHAPTER_REGEX_STR         = `\\b(${build_all_book_regex_str()})\\.?\\s+(\\d+)(?=\\s|$|[^\\d:.,])`;
 const CHAPTER_OSIS_REGEX_STR    = `\\b(${build_all_book_regex_str()}).(\\d+)\\b`;
-const CHAPTER_RANGE_REGEX_STR   = `\\b(${build_all_book_regex_str()})\\s+(\\d+)\\s*-\\s*(\\d+)\\b`;
-const VERSE_REGEX_STR           = `\\b(${build_all_book_regex_str()})\\s+(\\d+)\\s*:?\\s*(\\d+)(?=\\s|$|[^\\d])`;
+const CHAPTER_RANGE_REGEX_STR   = `\\b(${build_all_book_regex_str()})\\.?\\s+(\\d+)\\s*-\\s*(\\d+)\\b`;
+const VERSE_REGEX_STR           = `\\b(${build_all_book_regex_str()})\\.?\\s+(\\d+)\\s*:?\\s*(\\d+)(?=\\s|$|[^\\d])`;
 const VERSE_OSIS_REGEX_STR      = `\\b(${build_all_book_regex_str()})\\.(\\d+)\\.(\\d+)\\b`;
-const VERSE_RANGE_REGEX_STR     = `\\b(${build_all_book_regex_str()})\\s+(\\d+)\\s*(:|\\s)\\s*(\\d+)\\s*-\\s*(\\d+)\\b`;
+const VERSE_RANGE_REGEX_STR     = `\\b(${build_all_book_regex_str()})\\.?\\s+(\\d+)\\s*(:|\\s)\\s*(\\d+)\\s*-\\s*(\\d+)\\b`;
 export const REFERENCE_REGEX = RegExp(`(${VERSE_RANGE_REGEX_STR}|${VERSE_OSIS_REGEX_STR}|${VERSE_REGEX_STR}|${CHAPTER_RANGE_REGEX_STR}|${CHAPTER_OSIS_REGEX_STR}|${CHAPTER_REGEX_STR})`, "g");
 
 
@@ -284,15 +284,41 @@ function letter_to_regex(letter: string): string
     return `[${letter.toLowerCase()}${letter.toUpperCase()}]`;
 }
 
-function test()
-{
-    const error_cases: string[] = [
-        "the2 000"
-    ];
-
-    error_cases.forEach(c => {
-        console.log(find_verses(c))
-    });
+function prettyPrintFound(f: FoundVerse) {
+    return {
+        raw: f.raw,
+        ref_id: f.ref_id,
+        start: f.text_start,
+        end: f.text_end,
+        book: f.book,
+        chap: f.chapter_start,
+        vs: f.verse_start,
+        ve: f.verse_end
+    };
 }
 
-// test();
+function test() 
+{
+    const samples = [
+        "Rev. 1:8, 11; 21:6; 22:13",
+        "These letters occur in the text of Rev. 1:8, 11; 21:6; 22:13, and are represented",
+        "John 3:16, 17, 18",
+        "Matt 5:1; 6:2, 3; 7:4",
+        "Genesis 1:1",
+        "Isa 53:4-6",
+        "Rev. 1:8,11",           // no spaces after comma
+        "Rev. 1:8, 11, 12-14",  // combined range after comma
+        "1 John 2:1, 2; 3:4",    // numbered book with inheritance
+        "Acts 2:1; 3:2, 4-6; 4:1", // more complex
+    ];
+
+    for (const s of samples) 
+    {
+        console.log("TEXT:", s);
+        const found = find_verses(s).map(prettyPrintFound);
+        console.log(JSON.stringify(found, null, 2));
+        console.log("--------------------------------------------------");
+    }
+}
+
+test()
