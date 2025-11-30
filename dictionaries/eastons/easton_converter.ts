@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import * as toml from "@iarna/toml";
+import * as shared from "../../shared_utils";
 
 type EastonRawEntry = {
     term: string,
@@ -107,8 +108,9 @@ function process_definitions(definitions: string[], id_map: Map<string, number>)
 
 function process_text(text: string, id_map: Map<string, number>): string 
 {
-    const verses = find_verses(text);
-    // text = replace_verse_segments_formatted(text, verses);
+    text = shared.verse_find.replace_verses(text, f => (
+        ` <a href="${f.ref_id}">${f.raw}</a> `
+    ))
 
     const inner_reference_regex = /\[(\d+)\](\w+)/g;
     text = text.replaceAll(inner_reference_regex, (_, _num, term_raw) => {
@@ -118,7 +120,7 @@ function process_text(text: string, id_map: Map<string, number>): string
         term = term.charAt(0).toLocaleUpperCase() + term.slice(1);
         if (term_id !== undefined)
         {
-            return `<a href="${EBD_ALIAS}:${term_id}">${term}</a>`  
+            return ` <a href="${EBD_ALIAS}:${term_id}">${term}</a> `  
         }
         else 
         {
@@ -131,7 +133,3 @@ function process_text(text: string, id_map: Map<string, number>): string
 }
 
 run()
-
-function find_verses(text: string) {
-    throw new Error("Function not implemented.");
-}
