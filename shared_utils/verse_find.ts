@@ -118,6 +118,10 @@ const VERSE_OSIS_REGEX_STR      = `\\b(${build_all_book_regex_str()})\\.(\\d+)\\
 const VERSE_RANGE_REGEX_STR     = `\\b(${build_all_book_regex_str()})\\.?\\s+(\\d+)\\s*(:|\\s)\\s*(\\d+)\\s*-\\s*(\\d+)\\b`;
 const REFERENCE_REGEX = RegExp(`(${VERSE_RANGE_REGEX_STR}|${VERSE_OSIS_REGEX_STR}|${VERSE_REGEX_STR}|${CHAPTER_RANGE_REGEX_STR}|${CHAPTER_OSIS_REGEX_STR}|${CHAPTER_REGEX_STR})`, "g");
 
+const COMMA_VERSE_REGEX = /,\s+(\d+)/g;
+const COMMA_VERSE_RANGE_REGEX = /,\s+(\d+)\s*-\s*(\d+)/g;
+const CHAPTER_VERSE_REGEX = /;\s+(\d+)\s*:\s*(\d+)/g;
+const CHAPTER_VERSE_RANGE_REGEX = /;\s+(\d+)\s*:\s*(\d+)\s*-\s*(\d+)/g;
 
 function find_all_references(text: string): [number, number][]
 {
@@ -138,19 +142,23 @@ function parse_reference(reference: string, text_start: number, text_end: number
 
     let match = reference.match(wrap(CHAPTER_REGEX_STR)) || 
                 reference.match(wrap(CHAPTER_OSIS_REGEX_STR))
+
+    
+    const verses = [];
+
     if (match)
     {
         const book = map_book(match[1])!;
         const chapter = parseInt(match[2]);
         const ref_id = `${book}.${chapter}`;
-        return [{
+        verses.push({
             raw: reference,
             book,
             chapter_start: chapter,
             ref_id,
             text_start,
             text_end,
-        }]
+        })
     }
 
     match = reference.match(wrap(CHAPTER_RANGE_REGEX_STR))
@@ -160,7 +168,7 @@ function parse_reference(reference: string, text_start: number, text_end: number
         const chapter_start = parseInt(match[2]);
         const chapter_end = parseInt(match[3]);
         const ref_id = `${book}.${chapter_start}-${book}.${chapter_end}`;
-        return [{
+        verses.push({
             book: book,
             raw: reference,
             chapter_start,
@@ -168,7 +176,7 @@ function parse_reference(reference: string, text_start: number, text_end: number
             ref_id,
             text_start,
             text_end,
-        }]
+        });
     }
 
     match = reference.match(wrap(VERSE_OSIS_REGEX_STR)) || 
@@ -179,7 +187,7 @@ function parse_reference(reference: string, text_start: number, text_end: number
         const chapter = parseInt(match[2]);
         const verse = parseInt(match[3]);
         const ref_id = `${book}.${chapter}.${verse}`;
-        return [{
+        verses.push({
             book,
             text_end,
             text_start,
@@ -187,7 +195,7 @@ function parse_reference(reference: string, text_start: number, text_end: number
             chapter_start: chapter,
             verse_start: verse,
             raw: reference,
-        }]
+        });
     }
 
     match = reference.match(wrap(VERSE_RANGE_REGEX_STR));
@@ -199,7 +207,7 @@ function parse_reference(reference: string, text_start: number, text_end: number
         const verse_end = parseInt(match[5]);
         const ref_id = `${book}.${chapter}.${verse_start}-${book}.${chapter}.${verse_end}`
 
-        return [{
+        verses.push({
             book,
             text_end,
             text_start,
@@ -208,10 +216,18 @@ function parse_reference(reference: string, text_start: number, text_end: number
             verse_end,
             chapter_start: chapter,
             ref_id
-        }]
+        });
     }
 
-    return [];
+    if (verses.length > 0)
+    {
+        while(true)
+        {
+
+        }
+    }
+
+    return verses;
 }
 
 function build_all_book_regex_str(): string
