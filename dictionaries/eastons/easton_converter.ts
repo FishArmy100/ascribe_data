@@ -49,7 +49,7 @@ const EASTON_CONFIG = {
     license: "Public Domain",
     external: {
         aliases: {
-            "eastons_bible_dictionary": EBD_ALIAS
+            ebd: "eastons_bible_dictionary"
         }
     }
 }
@@ -109,7 +109,7 @@ function process_definitions(definitions: string[], id_map: Map<string, number>)
 function process_text(text: string, id_map: Map<string, number>): string 
 {
     text = shared.verse_find.replace_verses(text, f => {
-        const str = f.map(v => {
+        return f.map(v => {
             if (v.verse_start && v.verse_end)
             {
                 return `<a href="${v.ref_id}">${v.book_raw} ${v.chapter_start}:${v.verse_start}-${v.verse_end}</a>`
@@ -118,13 +118,15 @@ function process_text(text: string, id_map: Map<string, number>): string
             {
                 return `<a href="${v.ref_id}">${v.book_raw} ${v.chapter_start}:${v.verse_start}</a>`
             }
-            else 
+            else if (v.chapter_end)
             {
-                return null;
+                return `<a href="${v.ref_id}">${v.book_raw} ${v.chapter_start}-${v.chapter_end}</a>`
             }
-        }).filter(v => v != null).join("; ");
-
-        return ` ${str} `
+            else
+            {
+                return `<a href="${v.ref_id}">${v.book_raw} ${v.chapter_start}</a>`
+            }
+        }).join("; ");
     })
 
     const inner_reference_regex = /\[(\d+)\](\w+)/g;

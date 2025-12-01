@@ -141,56 +141,13 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
 {
     function wrap(s: string): RegExp 
     {
-        const regex = RegExp(s, "g");
-        regex.lastIndex = text_start;
-        return regex;
+        return RegExp(`(?<=^.{${text_start}})${s}`, "g");
     }
 
-    let match = full_text.matchAll(wrap(CHAPTER_REGEX_STR)).next().value || 
-                full_text.matchAll(wrap(CHAPTER_OSIS_REGEX_STR)).next().value
+    const verses = []
 
-    const verses: FoundVerse[] = [];
-
-    if (match)
-    {
-        const book = map_book(match[1])!;
-        const chapter = parseInt(match[2]);
-        const ref_id = `${book}.${chapter}`;
-        const text_end = text_start + match[0].length
-        verses.push({
-            raw: full_text.substring(text_start, text_end),
-            book,
-            chapter_start: chapter,
-            ref_id,
-            text_start,
-            text_end,
-            book_raw: match[1]
-        })
-    }
-
-    match = full_text.matchAll(wrap(CHAPTER_RANGE_REGEX_STR)).next().value
-    if (match && verses.length == 0)
-    {
-        const book = map_book(match[1])!;
-        const chapter_start = parseInt(match[2]);
-        const chapter_end = parseInt(match[3]);
-        const ref_id = `${book}.${chapter_start}-${book}.${chapter_end}`;
-        const text_end = text_start + match[0].length
-
-        verses.push({
-            book: book,
-            raw: full_text.substring(text_start, text_end),
-            chapter_start,
-            chapter_end,
-            ref_id,
-            text_start,
-            text_end,
-            book_raw: match[1]
-        });
-    }
-
-    match = full_text.matchAll(wrap(VERSE_OSIS_REGEX_STR)).next().value || 
-            full_text.matchAll(wrap(VERSE_REGEX_STR)).next().value
+    let match = full_text.matchAll(wrap(VERSE_OSIS_REGEX_STR)).next().value || 
+                full_text.matchAll(wrap(VERSE_REGEX_STR)).next().value
     if (match && verses.length == 0)
     {
         const book = map_book(match[1])!;
@@ -230,6 +187,47 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
             verse_end,
             chapter_start: chapter,
             ref_id,
+            book_raw: match[1]
+        });
+    }
+
+    match = full_text.matchAll(wrap(CHAPTER_REGEX_STR)).next().value || 
+            full_text.matchAll(wrap(CHAPTER_OSIS_REGEX_STR)).next().value
+
+    if (match && verses.length == 0)
+    {
+        const book = map_book(match[1])!;
+        const chapter = parseInt(match[2]);
+        const ref_id = `${book}.${chapter}`;
+        const text_end = text_start + match[0].length
+        verses.push({
+            raw: full_text.substring(text_start, text_end),
+            book,
+            chapter_start: chapter,
+            ref_id,
+            text_start,
+            text_end,
+            book_raw: match[1]
+        })
+    }
+
+    match = full_text.matchAll(wrap(CHAPTER_RANGE_REGEX_STR)).next().value
+    if (match && verses.length == 0)
+    {
+        const book = map_book(match[1])!;
+        const chapter_start = parseInt(match[2]);
+        const chapter_end = parseInt(match[3]);
+        const ref_id = `${book}.${chapter_start}-${book}.${chapter_end}`;
+        const text_end = text_start + match[0].length
+
+        verses.push({
+            book: book,
+            raw: full_text.substring(text_start, text_end),
+            chapter_start,
+            chapter_end,
+            ref_id,
+            text_start,
+            text_end,
             book_raw: match[1]
         });
     }
@@ -442,7 +440,7 @@ function test()
 {
     const samples = [
         // "Rev. 1:8, 11; 21:6; 22:13",
-        "These letters occur in the text of Rev. 1:8, 11, 13-14; 21:6; 22:13-14, and are represented",
+        // "These letters occur in the text of Rev. 1:8, 11, 13-14; 21:6; 22:13-14, and are represented",
         // "John 3:16, 17, 18",
         // "Matt 5:1; 6:2, 3; 7:4",
         // "Genesis 1:1",
@@ -451,6 +449,7 @@ function test()
         // "Rev. 1:8, 11, 12-14",  // combined range after comma
         // "1 John 2:1, 2; 3:4",    // numbered book with inheritance
         // "Acts 2:1; 3:2, 4-6; 4:1", // more complex
+        "Ezra 10:26",
     ];
 
     for (const s of samples) 
