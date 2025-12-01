@@ -82,21 +82,27 @@ export type FoundVerse = {
     text_end: number,
 
     book: OsisBook,
+    book_raw: string,
     chapter_start: number,
     chapter_end?: number,
     verse_start?: number,
     verse_end?: number,
 }
 
-export function replace_verses(text: string, replacer: (found: FoundVerse) => string): string 
+export function replace_verses(text: string, replacer: (found: FoundVerse[]) => string): string 
 {
-    const verses = find_verses(text);
-    const ordered = verses.sort((a, b) => b.text_start - a.text_start);
+    const verses = find_all_references(text).map(([start, _]) => {
+        return parse_reference(text, start);
+    });
+
+    const ordered = verses.sort((a, b) => Math.max(...b.map(b => b.text_start)) - Math.max(...a.map(a => a.text_start)));
     let output = text;
 
     ordered.forEach(o => {
         const replacement = replacer(o);
-        output = output.slice(0, o.text_start) + replacement + output.slice(o.text_end)
+        const start = Math.min(...o.map(o => o.text_start));
+        const end = Math.max(...o.map(o => o.text_end));
+        output = output.slice(0, start) + replacement + output.slice(end)
     });
 
     return output;
@@ -158,6 +164,7 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
             ref_id,
             text_start,
             text_end,
+            book_raw: match[1]
         })
     }
 
@@ -178,6 +185,7 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
             ref_id,
             text_start,
             text_end,
+            book_raw: match[1]
         });
     }
 
@@ -199,6 +207,7 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
             chapter_start: chapter,
             verse_start: verse,
             raw: full_text.substring(text_start, text_end),
+            book_raw: match[1]
         });
     }
 
@@ -220,7 +229,8 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
             verse_start,
             verse_end,
             chapter_start: chapter,
-            ref_id
+            ref_id,
+            book_raw: match[1]
         });
     }
 
@@ -257,6 +267,7 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
                     chapter_start: current_chapter,
                     verse_start,
                     verse_end,
+                    book_raw: verses[0].book_raw,
                 });
                 current_index = current_index + match[0].length;
                 continue;
@@ -275,7 +286,50 @@ function parse_reference(full_text: string, text_start: number): FoundVerse[]
                     book,
                     chapter_start: current_chapter,
                     verse_start: verse,
+                    book_raw: verses[0].book_raw,
                 });
+                current_index = current_index + match[0].length;
+                continue;
+            }
+
+            if (match = chapter_verse_range_regex.exec(full_text))
+            {
+                current_chapter = parseInt(match[1]);
+                const verse_start = parseInt(match[2]);
+                const verse_end = parseInt(match[3]);
+                const ref_id = `${book}.${current_chapter}.${verse_start}-${book}.${current_chapter}.${verse_end}`;
+                verses.push({
+                    raw: match[0],
+                    text_start: current_index,
+                    text_end: current_index + match[0].length,
+                    chapter_start: current_chapter,
+                    verse_start,
+                    verse_end,
+                    ref_id,
+                    book,
+                    book_raw: verses[0].book_raw,
+                })
+
+                current_index = current_index + match[0].length;
+                continue;
+            }
+
+            if (match = chapter_verse_regex.exec(full_text))
+            {
+                current_chapter = parseInt(match[1]);
+                const verse = parseInt(match[2]);
+                const ref_id = `${book}.${current_chapter}.${verse}`;
+                verses.push({
+                    raw: match[0],
+                    text_start: current_index,
+                    text_end: current_index + match[0].length,
+                    chapter_start: current_chapter,
+                    verse_start: verse,
+                    ref_id,
+                    book,
+                    book_raw: verses[0].book_raw,
+                })
+
                 current_index = current_index + match[0].length;
                 continue;
             }
@@ -388,7 +442,7 @@ function test()
 {
     const samples = [
         // "Rev. 1:8, 11; 21:6; 22:13",
-        "These letters occur in the text of Rev. 1:8, 11, 13-14; 21:6; 22:13, and are represented",
+        "These letters occur in the text of Rev. 1:8, 11, 13-14; 21:6; 22:13-14, and are represented",
         // "John 3:16, 17, 18",
         // "Matt 5:1; 6:2, 3; 7:4",
         // "Genesis 1:1",

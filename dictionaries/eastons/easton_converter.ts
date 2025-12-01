@@ -108,9 +108,24 @@ function process_definitions(definitions: string[], id_map: Map<string, number>)
 
 function process_text(text: string, id_map: Map<string, number>): string 
 {
-    text = shared.verse_find.replace_verses(text, f => (
-        ` <a href="${f.ref_id}">${f.raw}</a> `
-    ))
+    text = shared.verse_find.replace_verses(text, f => {
+        const str = f.map(v => {
+            if (v.verse_start && v.verse_end)
+            {
+                return `<a href="${v.ref_id}">${v.book_raw} ${v.chapter_start}:${v.verse_start}-${v.verse_end}</a>`
+            }
+            else if (v.verse_start)
+            {
+                return `<a href="${v.ref_id}">${v.book_raw} ${v.chapter_start}:${v.verse_start}</a>`
+            }
+            else 
+            {
+                return null;
+            }
+        }).filter(v => v != null).join("; ");
+
+        return ` ${str} `
+    })
 
     const inner_reference_regex = /\[(\d+)\](\w+)/g;
     text = text.replaceAll(inner_reference_regex, (_, _num, term_raw) => {
