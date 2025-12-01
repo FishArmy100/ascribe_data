@@ -104,9 +104,8 @@ export function replace_verses(text: string, replacer: (found: FoundVerse) => st
 
 export function find_verses(text: string): FoundVerse[]
 {
-    return find_all_references(text).map(([start, end]) => {
-        const ref_text = text.substring(start, end + 1);
-        return parse_reference(ref_text, start, end);
+    return find_all_references(text).map(([start, _]) => {
+        return parse_reference(text, start);
     }).flatMap(x => x);
 }
 
@@ -118,41 +117,42 @@ const VERSE_OSIS_REGEX_STR      = `\\b(${build_all_book_regex_str()})\\.(\\d+)\\
 const VERSE_RANGE_REGEX_STR     = `\\b(${build_all_book_regex_str()})\\.?\\s+(\\d+)\\s*(:|\\s)\\s*(\\d+)\\s*-\\s*(\\d+)\\b`;
 const REFERENCE_REGEX = RegExp(`(${VERSE_RANGE_REGEX_STR}|${VERSE_OSIS_REGEX_STR}|${VERSE_REGEX_STR}|${CHAPTER_RANGE_REGEX_STR}|${CHAPTER_OSIS_REGEX_STR}|${CHAPTER_REGEX_STR})`, "g");
 
-const COMMA_VERSE_REGEX = /,\s+(\d+)/g;
-const COMMA_VERSE_RANGE_REGEX = /,\s+(\d+)\s*-\s*(\d+)/g;
-const CHAPTER_VERSE_REGEX = /;\s+(\d+)\s*:\s*(\d+)/g;
-const CHAPTER_VERSE_RANGE_REGEX = /;\s+(\d+)\s*:\s*(\d+)\s*-\s*(\d+)/g;
+const make_comma_verse_regex = () => /,\s+(\d+)/y;
+const make_comma_verse_range_regex = () => /,\s+(\d+)\s*-\s*(\d+)/y;
+const make_chapter_verse_regex = () => /;\s+(\d+)\s*:\s*(\d+)/y;
+const make_chapter_verse_range_regex = () => /;\s+(\d+)\s*:\s*(\d+)\s*-\s*(\d+)/y;
 
 function find_all_references(text: string): [number, number][]
 {
-    const all_references = new Set(text.match(REFERENCE_REGEX) ?? [])
-    return Array.from(all_references).map(v => {
-        const start = text.indexOf(v);
-        const end = start + v.length - 1;
+    return Array.from(text.matchAll(REFERENCE_REGEX)).map(v => {
+        const start = v.index;
+        const end = start + v[0].length;
         return [start, end]
     });
 }
 
-function parse_reference(reference: string, text_start: number, text_end: number): FoundVerse[]
+function parse_reference(full_text: string, text_start: number): FoundVerse[]
 {
     function wrap(s: string): RegExp 
     {
-        return RegExp(`^${s}$`);
+        const regex = RegExp(s, "g");
+        regex.lastIndex = text_start;
+        return regex;
     }
 
-    let match = reference.match(wrap(CHAPTER_REGEX_STR)) || 
-                reference.match(wrap(CHAPTER_OSIS_REGEX_STR))
+    let match = full_text.matchAll(wrap(CHAPTER_REGEX_STR)).next().value || 
+                full_text.matchAll(wrap(CHAPTER_OSIS_REGEX_STR)).next().value
 
-    
-    const verses = [];
+    const verses: FoundVerse[] = [];
 
     if (match)
     {
         const book = map_book(match[1])!;
         const chapter = parseInt(match[2]);
         const ref_id = `${book}.${chapter}`;
+        const text_end = text_start + match[0].length
         verses.push({
-            raw: reference,
+            raw: full_text.substring(text_start, text_end),
             book,
             chapter_start: chapter,
             ref_id,
@@ -161,16 +161,18 @@ function parse_reference(reference: string, text_start: number, text_end: number
         })
     }
 
-    match = reference.match(wrap(CHAPTER_RANGE_REGEX_STR))
-    if (match)
+    match = full_text.matchAll(wrap(CHAPTER_RANGE_REGEX_STR)).next().value
+    if (match && verses.length == 0)
     {
         const book = map_book(match[1])!;
         const chapter_start = parseInt(match[2]);
         const chapter_end = parseInt(match[3]);
         const ref_id = `${book}.${chapter_start}-${book}.${chapter_end}`;
+        const text_end = text_start + match[0].length
+
         verses.push({
             book: book,
-            raw: reference,
+            raw: full_text.substring(text_start, text_end),
             chapter_start,
             chapter_end,
             ref_id,
@@ -179,14 +181,16 @@ function parse_reference(reference: string, text_start: number, text_end: number
         });
     }
 
-    match = reference.match(wrap(VERSE_OSIS_REGEX_STR)) || 
-            reference.match(wrap(VERSE_REGEX_STR))
-    if (match)
+    match = full_text.matchAll(wrap(VERSE_OSIS_REGEX_STR)).next().value || 
+            full_text.matchAll(wrap(VERSE_REGEX_STR)).next().value
+    if (match && verses.length == 0)
     {
         const book = map_book(match[1])!;
         const chapter = parseInt(match[2]);
         const verse = parseInt(match[3]);
         const ref_id = `${book}.${chapter}.${verse}`;
+        const text_end = text_start + match[0].length
+
         verses.push({
             book,
             text_end,
@@ -194,24 +198,25 @@ function parse_reference(reference: string, text_start: number, text_end: number
             ref_id,
             chapter_start: chapter,
             verse_start: verse,
-            raw: reference,
+            raw: full_text.substring(text_start, text_end),
         });
     }
 
-    match = reference.match(wrap(VERSE_RANGE_REGEX_STR));
-    if (match)
+    match = full_text.matchAll(wrap(VERSE_RANGE_REGEX_STR)).next().value;
+    if (match && verses.length == 0)
     {
         const book = map_book(match[1])!;
         const chapter = parseInt(match[2])
         const verse_start = parseInt(match[4]);
         const verse_end = parseInt(match[5]);
         const ref_id = `${book}.${chapter}.${verse_start}-${book}.${chapter}.${verse_end}`
+        const text_end = text_start + match[0].length
 
         verses.push({
             book,
             text_end,
             text_start,
-            raw: reference,
+            raw: full_text.substring(text_start, text_end),
             verse_start,
             verse_end,
             chapter_start: chapter,
@@ -221,9 +226,61 @@ function parse_reference(reference: string, text_start: number, text_end: number
 
     if (verses.length > 0)
     {
+        const comma_verse_regex = make_comma_verse_regex();
+        const comma_verse_range_regex = make_comma_verse_range_regex();
+        const chapter_verse_regex = make_chapter_verse_regex();
+        const chapter_verse_range_regex = make_chapter_verse_range_regex();
+
+        const regexes = [comma_verse_regex, comma_verse_range_regex, chapter_verse_regex, chapter_verse_range_regex];
+        const set_indexes = (index: number) => regexes.forEach(r => r.lastIndex = index);
+
+        let current_index = text_start + verses[0].raw.length;
+        const book = verses[0].book;
+        let current_chapter = verses[0].chapter_start
+ 
         while(true)
         {
+            set_indexes(current_index);
 
+            let match;
+            if (match = comma_verse_range_regex.exec(full_text))
+            {
+                const verse_start = parseInt(match[1]);
+                const verse_end = parseInt(match[2]);
+                const ref_id = `${book}.${current_chapter}.${verse_start}-${book}.${current_chapter}.${verse_end}`
+                verses.push({
+                    raw: match[0],
+                    text_start: current_index,
+                    text_end: current_index + match[0].length,
+                    ref_id: ref_id,
+                    book,
+                    chapter_start: current_chapter,
+                    verse_start,
+                    verse_end,
+                });
+                current_index = current_index + match[0].length;
+                continue;
+            }
+
+
+            if (match = comma_verse_regex.exec(full_text))
+            {
+                const verse = parseInt(match[1]);
+                const ref_id = `${book}.${current_chapter}.${verse}`
+                verses.push({
+                    raw: match[0],
+                    text_start: current_index,
+                    text_end: current_index + match[0].length,
+                    ref_id: ref_id,
+                    book,
+                    chapter_start: current_chapter,
+                    verse_start: verse,
+                });
+                current_index = current_index + match[0].length;
+                continue;
+            }
+
+            break;
         }
     }
 
@@ -330,16 +387,16 @@ function prettyPrintFound(f: FoundVerse) {
 function test() 
 {
     const samples = [
-        "Rev. 1:8, 11; 21:6; 22:13",
-        "These letters occur in the text of Rev. 1:8, 11; 21:6; 22:13, and are represented",
-        "John 3:16, 17, 18",
-        "Matt 5:1; 6:2, 3; 7:4",
-        "Genesis 1:1",
-        "Isa 53:4-6",
-        "Rev. 1:8,11",           // no spaces after comma
-        "Rev. 1:8, 11, 12-14",  // combined range after comma
-        "1 John 2:1, 2; 3:4",    // numbered book with inheritance
-        "Acts 2:1; 3:2, 4-6; 4:1", // more complex
+        // "Rev. 1:8, 11; 21:6; 22:13",
+        "These letters occur in the text of Rev. 1:8, 11, 13-14; 21:6; 22:13, and are represented",
+        // "John 3:16, 17, 18",
+        // "Matt 5:1; 6:2, 3; 7:4",
+        // "Genesis 1:1",
+        // "Isa 53:4-6",
+        // "Rev. 1:8,11",           // no spaces after comma
+        // "Rev. 1:8, 11, 12-14",  // combined range after comma
+        // "1 John 2:1, 2; 3:4",    // numbered book with inheritance
+        // "Acts 2:1; 3:2, 4-6; 4:1", // more complex
     ];
 
     for (const s of samples) 
