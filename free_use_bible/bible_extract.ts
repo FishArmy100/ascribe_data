@@ -3,6 +3,7 @@ import minimist from "minimist";
 import fs from "fs-extra";
 import { OsisBook, range } from "./utils";
 import * as toml from "@iarna/toml";
+import * as interop from "./interop";
 
 type WordJson = {
     red?: boolean,
@@ -29,6 +30,8 @@ type BibleConfig = {
 }
 
 type Args = {
+    display?: boolean,
+    langs?: boolean,
     name?: string,
     lang?: string,
     op?: string,
@@ -37,6 +40,28 @@ type Args = {
 async function run()
 {
     const args = minimist<Args>(process.argv.slice(2));
+
+    if (args.langs)
+    {
+        const languages = [...new Set((await interop.fetch_available_translations()).map(t => t.language))];
+        console.log("Languages");
+        languages.forEach(l => {
+            console.log(` - ${l}`)
+        });
+        return;
+    }
+
+    if (args.display)
+    {
+        const translations = (await interop.fetch_available_translations())
+            .filter(t => args.lang ? args.lang === t.language : true);
+
+        console.log("Translations:");
+        translations.forEach(t => {
+            console.log(` - ${t.name} (${t.shortName})`);
+        });
+        return;
+    }
     
     if (!args.name)
     {
@@ -145,7 +170,7 @@ function convert_verse(book: string, chapter: number, verse: bible.ChapterVerse,
 
 function split_punctuated_word(text: string): [string | null, string, string | null] {
     // Match beginning punctuation, word text, and ending punctuation
-    const match = text.match(/^(\W*)(\w+)(\W*)$/);
+    const match = text.match(/^([^\p{L}\p{N}]*)((?:[\p{L}\p{N}]+))([^\p{L}\p{N}]*)$/u);
     
     let begin_punc: string | null;
     let word: string;
