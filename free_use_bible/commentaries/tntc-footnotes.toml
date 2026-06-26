@@ -1,0 +1,6 @@
+name = "The New Testament with Commentary Footnotes"
+description = 'Footnotes based on the "The New Testament with Commentary" Bible'
+bible = "The New Testament with Commentary"
+license = "https://ebible.org/Scriptures/details.php?id=engf35"
+language = "eng"
+data_source = "https://ebible.org/Scriptures/details.php?id=engf35"

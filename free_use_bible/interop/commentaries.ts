@@ -207,7 +207,7 @@ export interface CommentaryBookChapter {
     chapter: CommentaryChapterData;
 }
 
-interface CommentaryChapterData {
+export interface CommentaryChapterData {
     /**
      * The number of the chapter.
      */

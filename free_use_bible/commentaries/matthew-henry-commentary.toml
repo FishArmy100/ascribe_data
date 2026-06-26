@@ -1,0 +1,4 @@
+name = "Matthew Henry Bible Commentary"
+license = "https://creativecommons.org/publicdomain/mark/1.0/"
+language = "eng"
+data_source = "https://en.wikipedia.org/wiki/Matthew_Henry"

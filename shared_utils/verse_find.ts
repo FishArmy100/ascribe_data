@@ -1,4 +1,3 @@
-import { group } from "console"
 import { OsisBook, range } from "."
 
 type BookInfo = {
@@ -63,7 +62,7 @@ const BOOK_ARRAY: { [name: string]: BookInfo } = {
     "1 Timothy": { osis: "1Tim" },
     "2 Timothy": { osis: "2Tim" },
     "Titus": { osis: "Titus" },
-    "Philemon": { osis: "Phil", aliases: [ "Phlm" ] },
+    "Philemon": { osis: "Phlm", aliases: [ "Phlm" ] },
     "Hebrews": { osis: "Heb" },
     "James": { osis: "Jas" },
     "1 Peter": { osis: "1Pet" },

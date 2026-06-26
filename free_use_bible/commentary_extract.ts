@@ -92,7 +92,16 @@ async function convert_commentary(commentary: interop.Commentary, format: boolea
         const book_name = interop.get_osis(book.id as interop.BibleBook);
 
         const entries = (await Promise.all(range(1, book.numberOfChapters + 1).map(async i => {
-            const chapter = (await interop.fetch_commentary_book_chapter(commentary.id, book.id, i)).chapter;        
+            let chapter: interop.CommentaryChapterData;
+            try 
+            {
+                chapter = (await interop.fetch_commentary_book_chapter(commentary.id, book.id, i)).chapter;        
+            }
+            catch 
+            {
+                console.error(`Error for ${book_name} ${i}`);
+                return null;
+            }
             
             const entries = chapter.content.map(v => {
                 if (typeof(v.content[0]) === "string")
@@ -122,7 +131,7 @@ async function convert_commentary(commentary: interop.Commentary, format: boolea
 
         console.log(`Fetched book ${book.name}`);
         return entries;
-    }))).flatMap(x => x)
+    }))).flatMap(x => x).filter(e => e !== null);
     
     entries.forEach((e, i) => {
         e.id = i
@@ -133,16 +142,7 @@ async function convert_commentary(commentary: interop.Commentary, format: boolea
     {
         await Promise.all(
             entries.map(async (e, i) => {
-                let ref = e.references.length === 1
-                    ? tp.parse_reference(e.references[0], 0, e.references[0].length - 1)
-                    : null;
-
-                if (ref) {
-                    e.comment = tp.raw_text_to_html_text(e.comment);
-                } else {
-                    e.comment = tp.raw_text_to_html_text(e.comment);
-                }
-
+                e.comment = tp.raw_text_to_html_text(e.comment);
                 console.log(`Progress: %${(i / entries.length) * 100}`);
             })
         );
