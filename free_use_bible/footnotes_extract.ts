@@ -1,6 +1,7 @@
 import minimist from "minimist";
 import * as interop from "./interop";
 import { OsisBook, range } from "./utils";
+import * as tp from "./process"
 import fs from "fs-extra";
 import toml from "@iarna/toml";
 
@@ -91,10 +92,14 @@ async function convert_footnotes(translation: interop.Translation): Promise<Comm
         }));
         console.log(`Completed book ${b.name}`);
         return entries
-    }))
+    }));
 
-    return entries.flatMap(x => x).flatMap(x => x).map((e, i) => {
+    console.log("Processing text....");
+
+    return entries.flatMap(x => x).flatMap(x => x).map((e, i, a) => {
         e.id = i;
+        e.comment = tp.raw_text_to_html_text(e.comment);
+        console.log(`Progress: %${(i / a.length) * 100}`);
         return e;
     });
 }

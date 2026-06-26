@@ -117,13 +117,15 @@ async function convert_bible(translation: string): Promise<VerseJson[]>
         }));
         console.log(`Completed book ${b.name}`);
         return book_verses;
-    })).then(p => p.flatMap(x => x).flatMap(x => x))
+    })).then(p => p.flatMap(x => x).flatMap(x => x));
 
-    verses.forEach((v, i) => {
+    const filled = fill_verse_gaps(verses);
+
+    filled.forEach((v, i) => {
         v.id = i;
     })
 
-    return verses;
+    return filled;
 }
 
 async function convert_config(translation: bible.Translation): Promise<BibleConfig>
@@ -191,6 +193,51 @@ function split_punctuated_word(text: string): [string | null, string, string | n
     }
 
     return [begin_punc, word, end_punc];
+}
+
+function fill_verse_gaps(verses: VerseJson[]): VerseJson[]
+{
+    const result: VerseJson[] = [];
+
+    for (let i = 0; i < verses.length; i++)
+    {
+        result.push(verses[i]);
+
+        if (i + 1 >= verses.length) continue;
+
+        const current = parse_verse_id(verses[i].verse_id);
+        const next = parse_verse_id(verses[i + 1].verse_id);
+
+        if (!current || !next) continue;
+
+        // Only fill gaps within the same book and chapter
+        if (current.book === next.book && current.chapter === next.chapter)
+        {
+            for (let v = current.verse + 1; v < next.verse; v++)
+            {
+                result.push({
+                    id: 0, // will be reassigned
+                    verse_id: `${current.book}.${current.chapter}.${v}`,
+                    words: [],
+                });
+            }
+        }
+    }
+
+    return result;
+}
+
+function parse_verse_id(verse_id: string): { book: string; chapter: number; verse: number } | null
+{
+    const parts = verse_id.split(".");
+    if (parts.length !== 3) return null;
+
+    const chapter = parseInt(parts[1], 10);
+    const verse = parseInt(parts[2], 10);
+
+    if (isNaN(chapter) || isNaN(verse)) return null;
+
+    return { book: parts[0], chapter, verse };
 }
 
 
