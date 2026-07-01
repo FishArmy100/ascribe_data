@@ -205,10 +205,12 @@ function processElementForStrongs(node: XmlNode, offset: number, strongsWords: A
     for (const child of node.children) {
         if (child.tag === "w") {
             const strongsAttr = child.attrs.savlm ?? "";
-            const numsList = strongsAttr
+            let numsList = strongsAttr
                 .split(/\s+/)
                 .map((value) => value.split(":")[1])
                 .filter(Boolean);
+
+            numsList = numsList.filter(l => /[GH]\d+/.test(l))
 
             const wWords = countAllTextWords(child);
             if (wWords === 0) {

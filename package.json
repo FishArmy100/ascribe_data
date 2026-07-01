@@ -2,7 +2,22 @@
   "scripts": {
     "strongs:defs": "tsx strongs/strongs_defs_converter.ts",
     "strongs:indexes": "tsx strongs/strongs_indexes_converter.ts",
-    "strongs:extract": "tsx strongs/extract_strongs_indexes.ts"
+    "strongs:extract": "tsx strongs/extract_strongs_indexes.ts",
+
+    "bible:bsb": "tsx free_use_bible/bible_extract.ts --lang eng --name BSB --op \"/free_use_bible/bibles/english\"",
+    "bible:asv": "tsx free_use_bible/bible_extract.ts --lang eng --name ASV --op \"/free_use_bible/bibles/english\"",
+    "bible:kjv": "tsx free_use_bible/bible_extract.ts --lang eng --name KJAV --op \"/free_use_bible/bibles/english\"",
+    "bible:bbe": "tsx free_use_bible/bible_extract.ts --lang eng --name BBE --op \"/free_use_bible/bibles/english\"",
+    "bible:ylt": "tsx free_use_bible/bible_extract.ts --lang eng --name YLT --op \"/free_use_bible/bibles/english\"",
+    "bible:eng": "npm run bible:bsb && npm run bible:asv && npm run bible:kjv && npm run bible:bbe && npm run bible:ylt",
+
+    "bible:ulb": "tsx free_use_bible/bible_extract.ts --lang swh --name ULB --op \"/free_use_bible/bibles/swahili\"",
+    "bible:swh": "npm run bible:ulb",
+
+    "bible:spa_rv": "tsx free_use_bible/bible_extract.ts --lang spa --name R09 --op \"/free_use_bible/bibles/spanish\"",
+    "bible:spa": "npm run bible:spa_rv",
+
+    "bible": "npm run bible:eng && npm run bible:spa && npm run bible:swh"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",

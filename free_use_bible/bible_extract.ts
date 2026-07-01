@@ -152,7 +152,6 @@ async function convert_config(translation: bible.Translation): Promise<BibleConf
 
 function convert_subtitle(subtitle: bible.ChapterHebrewSubtitle): WordJson[]
 {
-    console.log(subtitle, "Hi!")
     const words = subtitle.content.filter(c => typeof c === "string" || (c as any).text !== undefined).map(v => {
         const text = typeof v === "string" ? 
             v : 

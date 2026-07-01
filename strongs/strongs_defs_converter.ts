@@ -54,7 +54,8 @@ async function run() {
 
         const defs = row[3] && raw_text_to_html_text(row[3]);
         const deriv = row[4] && raw_text_to_html_text(row[4]);
-        const definition = `<h2><b>Definitions:</b></h2><p>${defs ?? ""}</p><br><h2><b>Derivation:</b></h2><p>${deriv ?? ""}</p>`;
+
+        const definition = `<h2><b>Definitions:</b></h2>${defs ?? ""}<br><h2><b>Derivation:</b></h2>${deriv ?? ""}`;
         const record = {
             strongs_ref: row[0] ?? "",
             definition,
