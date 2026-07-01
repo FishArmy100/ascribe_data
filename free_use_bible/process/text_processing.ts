@@ -16,5 +16,9 @@ export function raw_text_to_html_text(text: string): string
         return `<a href="${verse.ref_id}">${sub}</a>`;
     });
 
+    text = text.replaceAll(/[HG]\d+/g, (strong_num) => {
+        return `<a href="${strong_num}">${strong_num}</a>`;
+    })
+
     return text;
 }

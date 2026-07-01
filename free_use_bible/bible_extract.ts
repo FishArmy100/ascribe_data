@@ -11,6 +11,8 @@ type WordJson = {
     begin_punc?: string,
     end_punc?: string,
     text: string,
+    heb_sub?: boolean,
+    poem?: boolean
 }
 
 type VerseJson = {
@@ -107,13 +109,22 @@ async function convert_bible(translation: string): Promise<VerseJson[]>
     const verses =  await Promise.all(books.books.filter(b => !b.isApocryphal).map(async b => {
         const book_verses = Promise.all(range(1, b.numberOfChapters + 1).map(async c => {
             const chapter = await bible.fetch_chapter_in_translation(translation, b.id, c);
-            return chapter.chapter.content
+            const verses = chapter.chapter.content
                 .filter(c => c.type === "verse")
                 .map(c => {
                     const book_name = bible.get_osis(b.id as bible.BibleBook);
                     const chapter_number = chapter.chapter.number;
                     return convert_verse(book_name, chapter_number, c, 0);
                 });
+
+            const subtitles = chapter.chapter.content.filter(c => c.type === "hebrew_subtitle");
+            if (subtitles.length > 0)
+            {
+                const converted = convert_subtitle(subtitles[0])
+                verses[0].words = [ ...converted, ...verses[0].words]
+            }
+
+            return verses;
         }));
         console.log(`Completed book ${b.name}`);
         return book_verses;
@@ -139,6 +150,34 @@ async function convert_config(translation: bible.Translation): Promise<BibleConf
     }
 }
 
+function convert_subtitle(subtitle: bible.ChapterHebrewSubtitle): WordJson[]
+{
+    console.log(subtitle, "Hi!")
+    const words = subtitle.content.filter(c => typeof c === "string" || (c as any).text !== undefined).map(v => {
+        const text = typeof v === "string" ? 
+            v : 
+            (v as any).text as string;
+        
+        const red = (v as any).wordsOfJesus;
+
+        const words = text.split(/\s/).map((w): WordJson => {
+            const [begin_punc, word, end_punc] = split_punctuated_word(w.replaceAll("¶", ""));
+            return {
+                begin_punc: begin_punc ?? undefined,
+                text: word,
+                end_punc: end_punc ?? undefined,
+                red,
+                heb_sub: true,
+                italics: undefined,
+            }
+        });
+        
+        return words;
+    }).flatMap(ws => ws);
+
+    return words;
+}
+
 function convert_verse(book: string, chapter: number, verse: bible.ChapterVerse, id: number): VerseJson
 {
     const words = verse.content.filter(c => typeof c === "string" || (c as any).text !== undefined).map(v => {
@@ -149,7 +188,7 @@ function convert_verse(book: string, chapter: number, verse: bible.ChapterVerse,
         const red = (v as any).wordsOfJesus;
 
         const words = text.split(/\s/).map((w): WordJson => {
-            const [begin_punc, word, end_punc] = split_punctuated_word(w);
+            const [begin_punc, word, end_punc] = split_punctuated_word(w.replaceAll("¶", ""));
             return {
                 begin_punc: begin_punc ?? undefined,
                 text: word,

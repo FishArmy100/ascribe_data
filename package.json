@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "strongs:defs": "tsx strongs/strongs_defs_converter.ts",
+    "strongs:indexes": "tsx strongs/strongs_indexes_converter.ts",
+    "strongs:extract": "tsx strongs/extract_strongs_indexes.ts"
+  },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "fs-extra": "^11.3.2",
