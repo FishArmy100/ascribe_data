@@ -121,7 +121,7 @@ async function convert_bible(translation: string): Promise<VerseJson[]>
             if (subtitles.length > 0)
             {
                 const converted = convert_subtitle(subtitles[0])
-                verses[0].words = [ ...converted, ...verses[0].words]
+                verses[0].words = [ ...converted, ...verses[0].words];
             }
 
             return verses;
